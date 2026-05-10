@@ -184,70 +184,44 @@ async function doRegister() {
 
 // ===== LOGIN (connects to backend) =====
 async function doLogin() {
-  const btn = document.getElementById('btnLoginSubmit');
+  const btn   = document.getElementById('btnLoginSubmit');
   const email = document.getElementById('loginEmail')?.value;
-  const pass = document.getElementById('loginPass')?.value;
+  const pass  = document.getElementById('loginPass')?.value;
 
-  if (!email || !pass) {
-    alert('يرجى إدخال البيانات');
-    return;
-  }
+  if (!email || !pass) { alert(isArabic ? 'يرجى إدخال البيانات' : 'Please enter your details'); return; }
 
   btn.disabled = true;
-  btn.textContent = 'جارِ الدخول...';
+  btn.textContent = isArabic ? 'جارٍ الدخول...' : 'Signing in...';
 
   try {
-
-    const response = await fetch('/api/auth/login', {
+    const res  = await fetch(`${API_URL}/api/auth/login`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        email,
-        password: pass
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass })
     });
+    const data = await res.json();
 
-    const contentType = response.headers.get('content-type');
-
-    if (!contentType || !contentType.includes('application/json')) {
-      const text = await response.text();
-      console.error('NON JSON RESPONSE:', text);
-
-      alert('السيرفر أرجع HTML بدل JSON');
-      return;
+    if (data.success) {
+      if (data.skipOTP) {
+        // Session still valid - skip 2FA directly
+        localStorage.setItem('lsu_token', data.token);
+        localStorage.setItem('lsu_user', JSON.stringify(data.user));
+        const userName = data.user?.name || data.user?.firstName || '';
+        updateSidebarUser(userName, data.user?.membershipId || '');
+        enterSite(userName);
+      } else {
+        pendingUserId = data.userId;
+        show2FA();
+      }
+    } else {
+      alert(data.message);
     }
-
-    const data = await response.json();
-
-    console.log(data);
-
-    if (!response.ok) {
-      alert(data.message || 'Login failed');
-      return;
-    }
-
-    if (data.token) {
-      localStorage.setItem('lsu_token', data.token);
-    }
-
-    if (data.user) {
-      localStorage.setItem('lsu_user', JSON.stringify(data.user));
-    }
-
-    alert('تم تسجيل الدخول بنجاح');
-
-    window.location.href = '/';
-
   } catch (err) {
-    console.error(err);
-    alert('خطأ في الاتصال بالخادم');
+    alert(isArabic ? 'خطأ في الاتصال بالخادم' : 'Connection error. Check server.');
   }
 
   btn.disabled = false;
-  btn.textContent = 'دخول';
+  btn.textContent = isArabic ? 'دخول' : 'Sign In';
 }
 
 // ===== 2FA =====
@@ -754,13 +728,23 @@ function rotpKey(e, idx) {
 }
 
 async function doResetPassword() {
-  const otp = Array.from(document.querySelectorAll('#panelReset .otp-input')).map(i => i.value).join('');
+  const inputs = document.querySelectorAll('#panelReset .otp-input');
+  const otp = Array.from(inputs).map(i => i.value).join('');
   const newPass = document.getElementById('newPass')?.value;
   const newPassConf = document.getElementById('newPassConf')?.value;
 
-  if (otp.length < 6) { alert(isArabic ? 'أدخل الرمز كاملاً' : 'Enter the full code'); return; }
+  if (otp.length < 6) { alert(isArabic ? 'أدخل الرمز كاملاً (6 أرقام)' : 'Enter the full 6-digit code'); return; }
   if (!newPass || newPass.length < 6) { alert(isArabic ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters'); return; }
   if (newPass !== newPassConf) { alert(isArabic ? 'كلمتا المرور غير متطابقتين' : 'Passwords do not match'); return; }
+
+  if (!resetUserId) {
+    alert(isArabic ? 'حدث خطأ، يرجى طلب رمز جديد' : 'Error occurred, please request a new code');
+    switchTab('login');
+    showForgotPanel();
+    return;
+  }
+
+  console.log('🔑 Resetting with userId:', resetUserId, 'OTP:', otp);
 
   const btn = document.getElementById('btnResetSubmit');
   btn.disabled = true;
