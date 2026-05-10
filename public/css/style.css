@@ -1183,3 +1183,37 @@ body.ltr .scroll-top-btn { left: auto; right: 28px; }
   .hero-emblem { width: 70px; height: 70px; margin-bottom: 14px; }
   .hero-title { font-size: 1.5rem !important; }
 }
+
+/* ===================== NAVBAR SOLID - FINAL FIX ===================== */
+/* Remove old transparent background */
+nav {
+  transition: background .25s ease, box-shadow .25s ease !important;
+}
+
+/* Sidebar open → completely solid */
+nav.sidebar-open {
+  background: #0a0a0a !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 24px rgba(0,0,0,0.5) !important;
+}
+
+/* Light mode sidebar open → white */
+[data-theme="light"] nav.sidebar-open {
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 24px rgba(0,0,0,0.15) !important;
+}
+
+/* Scrolled → solid too */
+nav.scrolled {
+  background: #0a0a0a !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.4) !important;
+}
+[data-theme="light"] nav.scrolled {
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.12) !important;
+}

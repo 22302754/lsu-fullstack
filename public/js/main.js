@@ -62,6 +62,9 @@ function openSidebar() {
   document.body.style.overflow = 'hidden';
   const btn = document.getElementById('hamburgerBtn');
   if (btn) btn.classList.add('is-open');
+  // Make navbar solid when sidebar opens
+  const nav = document.getElementById('mainNav');
+  if (nav) nav.classList.add('sidebar-open');
 
   // Listen for sidebar scroll to show/hide up arrow
   sidebar.onscroll = function() {
@@ -76,9 +79,13 @@ function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarOverlay').classList.remove('open');
   document.body.style.overflow = '';
-  // Animate X back to hamburger
   const btn = document.getElementById('hamburgerBtn');
   if (btn) btn.classList.remove('is-open');
+  // Remove solid navbar if not scrolled
+  if (window.scrollY <= 20) {
+    const nav = document.getElementById('mainNav');
+    if (nav) nav.classList.remove('sidebar-open');
+  }
 }
 
 function toggleSidebar() {
