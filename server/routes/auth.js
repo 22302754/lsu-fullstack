@@ -1,26 +1,26 @@
-const express   = require('express');
-const CommReq   = require('../models/CommitteeRequest');
-const sendEmail = require('../utils/email');
-const router    = express.Router();
+const express = require('express');
 
-const COMMITTEE_HEADS = {
-  media:        { name: 'ياسين عقيل',   phone: '905428742246', email: 'yaseenaqeel20@gmail.com' },
-  organization: { name: 'محمد القمودي', phone: '218926131442', email: 'nory9071@gmail.com' },
-};
+const router = express.Router();
 
+// LOGIN
 router.post('/login', async (req, res) => {
+
   try {
 
     const { email, password } = req.body;
 
+    console.log('LOGIN:', email);
+
     if (!email || !password) {
+
       return res.status(400).json({
         success: false,
-        message: 'يرجى إدخال البيانات'
+        message: 'يرجى إدخال البريد وكلمة المرور'
       });
+
     }
 
-    // Admin login
+    // ADMIN LOGIN
     if (
       email === process.env.ADMIN_EMAIL &&
       password === process.env.ADMIN_PASSWORD
@@ -44,7 +44,7 @@ router.post('/login', async (req, res) => {
 
   } catch (err) {
 
-    console.error(err);
+    console.error('LOGIN ERROR:', err);
 
     return res.status(500).json({
       success: false,
@@ -52,5 +52,7 @@ router.post('/login', async (req, res) => {
     });
 
   }
+
 });
+
 module.exports = router;
