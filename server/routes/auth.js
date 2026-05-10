@@ -205,14 +205,19 @@ router.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
     const user = await User.findOne({ email });
 
-    // Always return success (security - don't reveal if email exists)
     if (!user) {
       return res.json({ success: true, message: 'إذا كان البريد مسجلاً ستصلك رسالة' });
     }
 
-    // Generate reset token (OTP as reset code)
-    const resetCode = user.generateOTP();
-    await user.save();
+    // Generate OTP
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    // Save directly using updateOne to avoid any pre-save hooks overwriting
+    await User.updateOne(
+      { _id: user._id },
+      { $set: { otp: { code: resetCode, expiresAt } } }
+    );
 
     console.log('\n🔑 ============================');
     console.log(`🔑 RESET CODE for ${email}: ${resetCode}`);
@@ -233,6 +238,7 @@ router.post('/forgot-password', async (req, res) => {
 
     res.json({ success: true, message: 'إذا كان البريد مسجلاً ستصلك رسالة', userId: user._id });
   } catch (err) {
+    console.error('Forgot password error:', err);
     res.status(500).json({ success: false, message: 'خطأ في الخادم' });
   }
 });
@@ -249,35 +255,47 @@ router.post('/reset-password', async (req, res) => {
     if (!user)
       return res.status(404).json({ success: false, message: 'المستخدم غير موجود' });
 
-    // Check OTP
+    // DEBUG
+    console.log('🔑 Reset attempt for:', user.email);
+    console.log('🔑 OTP in DB:', user.otp?.code);
+    console.log('🔑 OTP entered:', otp);
+    console.log('🔑 OTP expires:', user.otp?.expiresAt);
+    console.log('🔑 Now:', new Date());
+
+    // Check OTP exists
     if (!user.otp || !user.otp.code)
       return res.status(400).json({ success: false, message: 'لا يوجد رمز تحقق، اطلب رمزاً جديداً' });
 
+    // Check expiry
     if (new Date() > new Date(user.otp.expiresAt))
       return res.status(400).json({ success: false, message: 'انتهت صلاحية الرمز، اطلب رمزاً جديداً' });
 
-    const savedOTP   = String(user.otp.code).trim();
-    const enteredOTP = String(otp).trim();
+    // Compare - both as trimmed strings
+    const savedOTP   = String(user.otp.code).replace(/\s/g, '');
+    const enteredOTP = String(otp).replace(/\s/g, '');
+
+    console.log('🔑 Comparing:', savedOTP, '===', enteredOTP, '→', savedOTP === enteredOTP);
 
     if (savedOTP !== enteredOTP)
-      return res.status(400).json({ success: false, message: 'الرمز غير صحيح' });
+      return res.status(400).json({ success: false, message: `الرمز غير صحيح` });
 
     if (newPassword.length < 6)
       return res.status(400).json({ success: false, message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' });
 
-    // Update password
-    user.password = newPassword;
-    user.otp = undefined;
-    user.isVerified = true;
-    user.status = 'active';
-    await user.save();
+    // Update password using updateOne to avoid pre-save hooks issues
+    const bcrypt = require('bcryptjs');
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
 
-    console.log('✅ Password reset for:', user.email);
+    await User.updateOne(
+      { _id: user._id },
+      { $set: { password: hashedPassword, isVerified: true, status: 'active' }, $unset: { otp: '' } }
+    );
 
+    console.log('✅ Password reset successfully for:', user.email);
     res.json({ success: true, message: 'تم تغيير كلمة المرور بنجاح' });
 
   } catch (err) {
-    console.error(err);
+    console.error('Reset error:', err);
     res.status(500).json({ success: false, message: 'خطأ في الخادم' });
   }
 });
