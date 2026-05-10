@@ -26,19 +26,24 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// ── API Routes FIRST ──
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/members', require('./routes/members'));
+app.use('/api/committees', require('./routes/committees'));
+app.use('/api/admin', require('./routes/admin'));
+
 // ── Static Files ──
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/admin', express.static(path.join(__dirname, '../admin')));
 
-// ── API Routes ──
-app.use('/api/auth',       require('./routes/auth'));
-app.use('/api/members',    require('./routes/members'));
-app.use('/api/committees', require('./routes/committees'));
-app.use('/api/admin',      require('./routes/admin'));
-
-// ── Serve Frontend ──
+// ── Frontend Routes ──
 app.get('/admin*', (req, res) => {
   res.sendFile(path.join(__dirname, '../admin/index.html'));
+});
+
+// IMPORTANT: don't catch API routes
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 // Important: do NOT catch API routes
