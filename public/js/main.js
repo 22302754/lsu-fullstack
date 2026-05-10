@@ -197,33 +197,32 @@ async function doLogin() {
   btn.textContent = 'جارِ الدخول...';
 
   try {
-    console.log('Sending login request...');
 
     const response = await fetch('/api/auth/login', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
-        email: email,
+        email,
         password: pass
       })
     });
 
-    console.log('Status:', response.status);
+    const contentType = response.headers.get('content-type');
 
-    const text = await response.text();
-    console.log('Raw response:', text);
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('NON JSON RESPONSE:', text);
 
-    let data;
-
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      alert('السيرفر لم يرجع JSON صحيح');
-      console.error(e);
+      alert('السيرفر أرجع HTML بدل JSON');
       return;
     }
+
+    const data = await response.json();
+
+    console.log(data);
 
     if (!response.ok) {
       alert(data.message || 'Login failed');
@@ -242,13 +241,13 @@ async function doLogin() {
 
     window.location.href = '/';
 
-  } catch (error) {
-    console.error('LOGIN ERROR:', error);
+  } catch (err) {
+    console.error(err);
     alert('خطأ في الاتصال بالخادم');
   }
 
   btn.disabled = false;
-  btn.textContent = 'تسجيل الدخول';
+  btn.textContent = 'دخول';
 }
 
 // ===== 2FA =====
