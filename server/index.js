@@ -19,8 +19,8 @@ app.use(compression());
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 // ── Rate Limiting ──
-app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
-app.use('/api/auth/', rateLimit({ windowMs: 15 * 60 * 1000, max: 15 }));
+//app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
+//app.use('/api/auth/', rateLimit({ windowMs: 15 * 60 * 1000, max: 15 }));
 
 // ── Body Parser ──
 app.use(express.json({ limit: '10mb' }));
