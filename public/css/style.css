@@ -1040,3 +1040,146 @@ body.ltr .wa-float { left: auto; right: 28px; }
 /* Scroll to top btn moves up to not overlap with WhatsApp btn */
 .scroll-top-btn { bottom: 96px !important; left: 28px; }
 body.ltr .scroll-top-btn { left: auto; right: 28px; }
+
+/* ===================== MOBILE RESPONSIVE - COMPLETE FIX ===================== */
+
+/* ── Phones (max 480px) ── */
+@media (max-width: 480px) {
+
+  /* NAVBAR */
+  nav { padding: 0 14px; height: 58px; }
+  .nav-logo img { width: 34px; height: 34px; }
+  .nav-logo-text span { font-size: .82rem; }
+  .nav-logo-text small { display: none; }
+  .lang-btn { padding: 5px 11px; font-size: .75rem; }
+  .hamburger-btn { width: 38px; height: 38px; }
+  .theme-btn { width: 34px; height: 34px; font-size: 1rem; }
+
+  /* HERO */
+  #hero { padding: 58px 16px 40px; }
+  .hero-emblem { width: 80px; height: 80px; margin-bottom: 20px; }
+  .hero-eyebrow { font-size: .7rem; letter-spacing: 3px; }
+  .hero-title { font-size: 1.65rem !important; line-height: 1.3; }
+  .hero-title-en { font-size: .78rem !important; letter-spacing: 2px; }
+  .hero-divider { width: 50px; margin-bottom: 18px; }
+  .hero-desc { font-size: .88rem; line-height: 1.85; margin-bottom: 26px; }
+  .hero-btns { flex-direction: column; align-items: center; gap: 10px; }
+  .hero-cta { padding: 12px 28px; font-size: .9rem; width: 100%; justify-content: center; }
+  .hero-cta-outline { padding: 11px 24px; font-size: .88rem; width: 100%; justify-content: center; }
+  .hero-flags { gap: 8px; }
+  .flag-pill { padding: 6px 12px; font-size: .75rem; }
+
+  /* SECTIONS */
+  section { padding: 50px 16px; }
+  .section-title { font-size: 1.55rem !important; }
+  .section-label { font-size: .7rem; letter-spacing: 3px; }
+  .section-desc { font-size: .88rem; }
+
+  /* ABOUT */
+  .about-grid { grid-template-columns: 1fr !important; gap: 30px !important; }
+  .about-visual { order: -1; }
+  .about-ring { width: 180px; height: 180px; }
+  .about-ring-inner img { width: 110px; height: 110px; }
+  .about-text p { font-size: .88rem; line-height: 2; }
+  .about-stats { grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 24px; }
+  .stat-card { padding: 16px 10px; }
+  .stat-num { font-size: 1.7rem; }
+  .stat-label { font-size: .75rem; }
+
+  /* LEADERSHIP */
+  .president-row { grid-template-columns: 1fr !important; gap: 14px !important; }
+  .leader-card { padding: 26px 18px; }
+  .leader-avatar { width: 72px; height: 72px; font-size: 1.5rem; }
+  .leader-name { font-size: 1.2rem; }
+  .board-grid { grid-template-columns: 1fr 1fr !important; gap: 10px; }
+  .board-card { padding: 18px 12px; }
+  .board-avatar { width: 50px; height: 50px; font-size: 1rem; }
+  .board-name { font-size: .88rem; }
+  .board-role { font-size: .7rem; }
+
+  /* COMMITTEES */
+  .committees-grid { grid-template-columns: 1fr !important; gap: 14px; }
+  .committee-card { padding: 26px 18px; }
+  .committee-icon { font-size: 2rem; }
+  .committee-name { font-size: 1.2rem; }
+  .committee-desc { font-size: .85rem; }
+  .btn-join-committee { font-size: .82rem; padding: 9px 16px; }
+
+  /* GOALS */
+  .goals-grid { grid-template-columns: 1fr !important; gap: 12px; }
+  .goal-card { padding: 24px 18px; }
+  .goal-icon { font-size: 1.9rem; margin-bottom: 12px; }
+  .goal-title { font-size: 1.1rem; }
+  .goal-text { font-size: .84rem; }
+
+  /* CONTACT */
+  .contact-cards { grid-template-columns: 1fr !important; gap: 11px; }
+  .contact-badge-icon svg { width: 44px; height: 44px; }
+  .contact-card-val { font-size: .82rem; }
+
+  /* FOOTER */
+  footer { padding: 36px 16px 24px; }
+  .footer-inner { gap: 22px; }
+  .footer-logo img { width: 38px; height: 38px; }
+  .footer-name { font-size: .9rem; }
+  .footer-social { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .footer-social-btn { font-size: .78rem; padding: 7px 12px; }
+
+  /* MODALS */
+  #authModal, #twoFAModal { padding: 16px 12px; }
+  .modal-box { padding: 24px 16px; border-radius: 18px; }
+  .modal-logo img { width: 60px; height: 60px; }
+  .modal-title { font-size: 1.25rem; }
+  .modal-subtitle { font-size: .74rem; margin-bottom: 20px; }
+  .tab-btn { font-size: .82rem; padding: 9px; }
+  .form-grid { grid-template-columns: 1fr !important; gap: 10px; }
+  .field label { font-size: .73rem; }
+  .field input, .field select { padding: 10px 12px; font-size: .88rem; }
+  .btn-primary { padding: 12px; font-size: .92rem; }
+
+  /* OTP */
+  .otp-row { gap: 6px; }
+  .otp-input { width: 40px; height: 48px; font-size: 1.25rem; border-radius: 10px; }
+
+  /* SIDEBAR */
+  .sidebar { width: 100% !important; max-width: 290px; }
+  .sidebar-header { padding: 18px 18px 14px; }
+  .sidebar-logo img { width: 38px; height: 38px; }
+  .sidebar-logo-text { font-size: .9rem; }
+  .acc-header { padding: 14px 18px; font-size: .93rem; }
+  .acc-body .sidebar-link { padding: 11px 18px 11px 26px; font-size: .9rem; }
+  .sidebar-footer { padding: 14px 18px 16px; }
+
+  /* WHATSAPP & SCROLL BTN */
+  .wa-float { width: 48px; height: 48px; bottom: 22px; left: 22px; }
+  .wa-float svg { width: 22px; height: 22px; }
+  .scroll-top-btn { width: 42px; height: 42px; font-size: 1.1rem; bottom: 84px !important; left: 22px; }
+}
+
+/* ── Tablets (481px - 768px) ── */
+@media (min-width: 481px) and (max-width: 768px) {
+
+  nav { padding: 0 20px; height: 62px; }
+  .nav-logo-text small { display: none; }
+  section { padding: 56px 22px; }
+  .hero-title { font-size: 2.1rem !important; }
+  .hero-btns { gap: 12px; }
+  .about-grid { grid-template-columns: 1fr !important; gap: 36px !important; }
+  .about-visual { order: -1; }
+  .about-stats { grid-template-columns: 1fr 1fr; }
+  .president-row { grid-template-columns: 1fr 1fr !important; }
+  .board-grid { grid-template-columns: 1fr 1fr !important; }
+  .committees-grid { grid-template-columns: 1fr !important; }
+  .goals-grid { grid-template-columns: 1fr 1fr !important; }
+  .contact-cards { grid-template-columns: 1fr 1fr !important; }
+  .footer-inner { grid-template-columns: 1fr !important; }
+  .form-grid { grid-template-columns: 1fr !important; }
+  .modal-box { padding: 28px 20px; }
+}
+
+/* ── Large phones landscape ── */
+@media (max-width: 768px) and (orientation: landscape) {
+  #hero { min-height: auto; padding: 80px 20px 40px; }
+  .hero-emblem { width: 70px; height: 70px; margin-bottom: 14px; }
+  .hero-title { font-size: 1.5rem !important; }
+}

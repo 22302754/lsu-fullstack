@@ -706,23 +706,29 @@ function toggleAcc(num) {
   if (!isOpen) {
     body.classList.add('open');
     arrow.classList.add('rotated');
-    // Scroll sidebar to show new content
+
     setTimeout(() => {
+      // Scroll sidebar to show new content
       const header = document.getElementById('acc'+num);
       const sidebar = document.getElementById('sidebar');
       if (header && sidebar) {
         sidebar.scrollTo({ top: header.offsetTop - 10, behavior: 'smooth' });
       }
-      // Show up arrow since sidebar scrolled
-      setTimeout(() => {
-        const arrowDiv = document.getElementById('sidebarScrollTopDiv');
-        if (arrowDiv) arrowDiv.style.display = 'flex';
-      }, 300);
-    }, 80);
+      // Scroll MAIN PAGE down so content below sidebar is visible
+      const bodyHeight = body.scrollHeight;
+      const currentScroll = window.scrollY;
+      window.scrollTo({ top: currentScroll + Math.min(bodyHeight, 200), behavior: 'smooth' });
+
+      // Show up arrow
+      const arrowDiv = document.getElementById('sidebarScrollTopDiv');
+      if (arrowDiv) arrowDiv.style.display = 'flex';
+    }, 100);
+
   } else {
-    // Closed - scroll sidebar back to top
+    // Closed - scroll sidebar back to top, page scrolls up a bit
     const sidebar = document.getElementById('sidebar');
     if (sidebar) sidebar.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: Math.max(0, window.scrollY - 150), behavior: 'smooth' });
   }
 }
 
