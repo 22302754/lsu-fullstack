@@ -184,44 +184,71 @@ async function doRegister() {
 
 // ===== LOGIN (connects to backend) =====
 async function doLogin() {
-  const btn   = document.getElementById('btnLoginSubmit');
+  const btn = document.getElementById('btnLoginSubmit');
   const email = document.getElementById('loginEmail')?.value;
-  const pass  = document.getElementById('loginPass')?.value;
+  const pass = document.getElementById('loginPass')?.value;
 
-  if (!email || !pass) { alert(isArabic ? 'يرجى إدخال البيانات' : 'Please enter your details'); return; }
+  if (!email || !pass) {
+    alert('يرجى إدخال البيانات');
+    return;
+  }
 
   btn.disabled = true;
-  btn.textContent = isArabic ? 'جارٍ الدخول...' : 'Signing in...';
+  btn.textContent = 'جارِ الدخول...';
 
   try {
-    const res  = await fetch(`${API_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password: pass })
-    });
-    const data = await res.json();
+    console.log('Sending login request...');
 
-    if (data.success) {
-      if (data.skipOTP) {
-        // Session still valid - skip 2FA directly
-        localStorage.setItem('lsu_token', data.token);
-        localStorage.setItem('lsu_user', JSON.stringify(data.user));
-        const userName = data.user?.name || data.user?.firstName || '';
-        updateSidebarUser(userName, data.user?.membershipId || '');
-        enterSite(userName);
-      } else {
-        pendingUserId = data.userId;
-        show2FA();
-      }
-    } else {
-      alert(data.message);
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: email,
+        password: pass
+      })
+    });
+
+    console.log('Status:', response.status);
+
+    const text = await response.text();
+    console.log('Raw response:', text);
+
+    let data;
+
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      alert('السيرفر لم يرجع JSON صحيح');
+      console.error(e);
+      return;
     }
-  } catch (err) {
-    alert(isArabic ? 'خطأ في الاتصال بالخادم' : 'Connection error. Check server.');
+
+    if (!response.ok) {
+      alert(data.message || 'Login failed');
+      return;
+    }
+
+    if (data.token) {
+      localStorage.setItem('lsu_token', data.token);
+    }
+
+    if (data.user) {
+      localStorage.setItem('lsu_user', JSON.stringify(data.user));
+    }
+
+    alert('تم تسجيل الدخول بنجاح');
+
+    window.location.href = '/';
+
+  } catch (error) {
+    console.error('LOGIN ERROR:', error);
+    alert('خطأ في الاتصال بالخادم');
   }
 
   btn.disabled = false;
-  btn.textContent = isArabic ? 'دخول' : 'Sign In';
+  btn.textContent = 'تسجيل الدخول';
 }
 
 // ===== 2FA =====
