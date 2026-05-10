@@ -76,12 +76,17 @@
 
       <!-- OTP boxes -->
       <div class="otp-row" style="margin:16px 0 20px;">
-        <input class="otp-input" type="number" min="0" max="9" id="rotp1" oninput="rotpMove(this,0)" onkeydown="rotpKey(event,0)">
-        <input class="otp-input" type="number" min="0" max="9" id="rotp2" oninput="rotpMove(this,1)" onkeydown="rotpKey(event,1)">
-        <input class="otp-input" type="number" min="0" max="9" id="rotp3" oninput="rotpMove(this,2)" onkeydown="rotpKey(event,2)">
-        <input class="otp-input" type="number" min="0" max="9" id="rotp4" oninput="rotpMove(this,3)" onkeydown="rotpKey(event,3)">
-        <input class="otp-input" type="number" min="0" max="9" id="rotp5" oninput="rotpMove(this,4)" onkeydown="rotpKey(event,4)">
-        <input class="otp-input" type="number" min="0" max="9" id="rotp6" oninput="rotpMove(this,5)" onkeydown="rotpKey(event,5)">
+       <input type="text" maxlength="1" class="otp-input" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,''); if(this.value.length===1) this.nextElementSibling?.focus();" />
+
+<input type="text" maxlength="1" class="otp-input" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,''); if(this.value.length===1) this.nextElementSibling?.focus();" />
+
+<input type="text" maxlength="1" class="otp-input" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,''); if(this.value.length===1) this.nextElementSibling?.focus();" />
+
+<input type="text" maxlength="1" class="otp-input" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,''); if(this.value.length===1) this.nextElementSibling?.focus();" />
+
+<input type="text" maxlength="1" class="otp-input" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,''); if(this.value.length===1) this.nextElementSibling?.focus();" />
+
+<input type="text" maxlength="1" class="otp-input" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
       </div>
 
       <div class="form-stack">
