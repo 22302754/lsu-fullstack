@@ -659,6 +659,8 @@ function showForgotPanel() {
   document.getElementById('btnLogin').classList.remove('active');
 }
 
+let resetUserId = null;
+
 async function doForgotPassword() {
   const email = document.getElementById('forgotEmail')?.value;
   if (!email) { alert(isArabic ? 'أدخل بريدك الإلكتروني' : 'Enter your email'); return; }
@@ -674,17 +676,91 @@ async function doForgotPassword() {
       body: JSON.stringify({ email })
     });
     const data = await res.json();
+
+    if (data.userId) resetUserId = data.userId;
+
+    // Show success then switch to reset panel after 1.5s
     const msg = document.getElementById('forgotSuccess');
     msg.style.display = 'block';
     msg.textContent = isArabic
-      ? '✓ إذا كان البريد مسجلاً ستصلك رسالة قريباً'
-      : '✓ If this email is registered, you will receive a reset link';
+      ? '✓ تم إرسال الرمز! تفقد بريدك الإلكتروني'
+      : '✓ Code sent! Check your email';
+
+    setTimeout(() => {
+      // Switch to reset panel
+      ['panelLogin','panelRegister','panelForgot','panelReset'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+      });
+      document.getElementById('panelReset').classList.add('active');
+      document.getElementById('btnLogin').classList.remove('active');
+      document.getElementById('btnReg').classList.remove('active');
+      // Clear OTP boxes
+      document.querySelectorAll('#panelReset .otp-input').forEach(i => i.value = '');
+      document.getElementById('rotp1')?.focus();
+    }, 1500);
+
   } catch(e) {
     alert(isArabic ? 'خطأ في الاتصال' : 'Connection error');
   }
 
   btn.disabled = false;
   btn.textContent = isArabic ? 'إرسال رابط الإعادة' : 'Send Reset Link';
+}
+
+// Reset OTP input handlers
+function rotpMove(el, idx) {
+  el.value = el.value.slice(-1).replace(/[^0-9]/g,'');
+  if (el.value && idx < 5) {
+    document.querySelectorAll('#panelReset .otp-input')[idx + 1]?.focus();
+  }
+}
+function rotpKey(e, idx) {
+  const inputs = document.querySelectorAll('#panelReset .otp-input');
+  if (e.key === 'Backspace') {
+    inputs[idx].value = '';
+    if (idx > 0) inputs[idx-1]?.focus();
+    e.preventDefault();
+  }
+}
+
+async function doResetPassword() {
+  const otp = Array.from(document.querySelectorAll('#panelReset .otp-input')).map(i => i.value).join('');
+  const newPass = document.getElementById('newPass')?.value;
+  const newPassConf = document.getElementById('newPassConf')?.value;
+
+  if (otp.length < 6) { alert(isArabic ? 'أدخل الرمز كاملاً' : 'Enter the full code'); return; }
+  if (!newPass || newPass.length < 6) { alert(isArabic ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters'); return; }
+  if (newPass !== newPassConf) { alert(isArabic ? 'كلمتا المرور غير متطابقتين' : 'Passwords do not match'); return; }
+
+  const btn = document.getElementById('btnResetSubmit');
+  btn.disabled = true;
+  btn.textContent = isArabic ? 'جارٍ التغيير...' : 'Changing...';
+
+  try {
+    const res = await fetch(`${API_URL}/api/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: resetUserId, otp, newPassword: newPass })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      const msg = document.getElementById('resetSuccess');
+      msg.style.display = 'block';
+      setTimeout(() => {
+        switchTab('login');
+        msg.style.display = 'none';
+      }, 2500);
+    } else {
+      alert(data.message);
+    }
+  } catch(e) {
+    alert(isArabic ? 'خطأ في الاتصال' : 'Connection error');
+  }
+
+  btn.disabled = false;
+  btn.textContent = isArabic ? 'تغيير كلمة المرور' : 'Change Password';
 }
 
 // ===== BACK FROM 2FA =====

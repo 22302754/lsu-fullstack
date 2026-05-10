@@ -66,7 +66,42 @@
         </div>
       </div>
       <button class="btn-primary" onclick="doForgotPassword()" id="btnForgotSubmit">إرسال رابط الإعادة</button>
-      <div class="success-msg" id="forgotSuccess">✓ تم إرسال الرابط! تفقد بريدك الإلكتروني</div>
+      <div class="success-msg" id="forgotSuccess">✓ تم إرسال الرمز! تفقد بريدك الإلكتروني</div>
+    </div>
+
+    <!-- RESET PASSWORD -->
+    <div class="form-panel" id="panelReset">
+      <button class="back-btn" onclick="switchTab('login')">← <span id="resetBackText">رجوع</span></button>
+      <p class="forgot-desc" id="resetDesc">أدخل الرمز الذي وصلك ثم كلمة المرور الجديدة</p>
+
+      <!-- OTP boxes -->
+      <div class="otp-row" style="margin:16px 0 20px;">
+        <input class="otp-input" type="number" min="0" max="9" id="rotp1" oninput="rotpMove(this,0)" onkeydown="rotpKey(event,0)">
+        <input class="otp-input" type="number" min="0" max="9" id="rotp2" oninput="rotpMove(this,1)" onkeydown="rotpKey(event,1)">
+        <input class="otp-input" type="number" min="0" max="9" id="rotp3" oninput="rotpMove(this,2)" onkeydown="rotpKey(event,2)">
+        <input class="otp-input" type="number" min="0" max="9" id="rotp4" oninput="rotpMove(this,3)" onkeydown="rotpKey(event,3)">
+        <input class="otp-input" type="number" min="0" max="9" id="rotp5" oninput="rotpMove(this,4)" onkeydown="rotpKey(event,4)">
+        <input class="otp-input" type="number" min="0" max="9" id="rotp6" oninput="rotpMove(this,5)" onkeydown="rotpKey(event,5)">
+      </div>
+
+      <div class="form-stack">
+        <div class="field">
+          <label id="lNewPass">كلمة المرور الجديدة</label>
+          <div class="pass-field">
+            <input type="password" id="newPass" placeholder="••••••••">
+            <button type="button" class="eye-btn" onclick="togglePass('newPass',this)">👁</button>
+          </div>
+        </div>
+        <div class="field">
+          <label id="lNewPassConf">تأكيد كلمة المرور</label>
+          <div class="pass-field">
+            <input type="password" id="newPassConf" placeholder="••••••••">
+            <button type="button" class="eye-btn" onclick="togglePass('newPassConf',this)">👁</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="doResetPassword()" id="btnResetSubmit">تغيير كلمة المرور</button>
+      <div class="success-msg" id="resetSuccess">✓ تم تغيير كلمة المرور! يمكنك تسجيل الدخول الآن</div>
     </div>
 
     <!-- REGISTER -->

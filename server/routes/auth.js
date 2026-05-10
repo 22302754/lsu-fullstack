@@ -236,3 +236,48 @@ router.post('/forgot-password', async (req, res) => {
     res.status(500).json({ success: false, message: 'خطأ في الخادم' });
   }
 });
+
+// ── RESET PASSWORD ──
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { userId, otp, newPassword } = req.body;
+
+    if (!userId || !otp || !newPassword)
+      return res.status(400).json({ success: false, message: 'بيانات ناقصة' });
+
+    const user = await User.findById(userId);
+    if (!user)
+      return res.status(404).json({ success: false, message: 'المستخدم غير موجود' });
+
+    // Check OTP
+    if (!user.otp || !user.otp.code)
+      return res.status(400).json({ success: false, message: 'لا يوجد رمز تحقق، اطلب رمزاً جديداً' });
+
+    if (new Date() > new Date(user.otp.expiresAt))
+      return res.status(400).json({ success: false, message: 'انتهت صلاحية الرمز، اطلب رمزاً جديداً' });
+
+    const savedOTP   = String(user.otp.code).trim();
+    const enteredOTP = String(otp).trim();
+
+    if (savedOTP !== enteredOTP)
+      return res.status(400).json({ success: false, message: 'الرمز غير صحيح' });
+
+    if (newPassword.length < 6)
+      return res.status(400).json({ success: false, message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' });
+
+    // Update password
+    user.password = newPassword;
+    user.otp = undefined;
+    user.isVerified = true;
+    user.status = 'active';
+    await user.save();
+
+    console.log('✅ Password reset for:', user.email);
+
+    res.json({ success: true, message: 'تم تغيير كلمة المرور بنجاح' });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'خطأ في الخادم' });
+  }
+});
