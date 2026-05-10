@@ -99,11 +99,12 @@ function toggleSidebar() {
 
 // ===== AUTH MODAL =====
 function switchTab(tab) {
-  ['panelLogin','panelRegister','panelForgot'].forEach(id => {
+  ['panelLogin','panelRegister','panelForgot','panelReset'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
   });
-  const target = document.getElementById('panel' + tab.charAt(0).toUpperCase() + tab.slice(1));
+  const panelId = 'panel' + tab.charAt(0).toUpperCase() + tab.slice(1);
+  const target = document.getElementById(panelId);
   if (target) target.classList.add('active');
   document.getElementById('btnLogin').classList.toggle('active', tab === 'login');
   document.getElementById('btnReg').classList.toggle('active', tab === 'register');
@@ -679,26 +680,15 @@ async function doForgotPassword() {
 
     if (data.userId) resetUserId = data.userId;
 
-    // Show success then switch to reset panel after 1.5s
+    // Show success message with button to enter code
     const msg = document.getElementById('forgotSuccess');
     msg.style.display = 'block';
-    msg.textContent = isArabic
-      ? '✓ تم إرسال الرمز! تفقد بريدك الإلكتروني'
-      : '✓ Code sent! Check your email';
+    msg.innerHTML = isArabic
+      ? '✓ تم إرسال الرمز! <a onclick="showResetPanel()" style="color:#fff;font-weight:700;cursor:pointer;text-decoration:underline">اضغط هنا لإدخال الرمز ←</a>'
+      : '✓ Code sent! <a onclick="showResetPanel()" style="color:#fff;font-weight:700;cursor:pointer;text-decoration:underline">Click here to enter code ←</a>';
 
-    setTimeout(() => {
-      // Switch to reset panel
-      ['panelLogin','panelRegister','panelForgot','panelReset'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.remove('active');
-      });
-      document.getElementById('panelReset').classList.add('active');
-      document.getElementById('btnLogin').classList.remove('active');
-      document.getElementById('btnReg').classList.remove('active');
-      // Clear OTP boxes
-      document.querySelectorAll('#panelReset .otp-input').forEach(i => i.value = '');
-      document.getElementById('rotp1')?.focus();
-    }, 1500);
+    // Auto switch after 2s
+    setTimeout(() => showResetPanel(), 2000);
 
   } catch(e) {
     alert(isArabic ? 'خطأ في الاتصال' : 'Connection error');
@@ -709,6 +699,19 @@ async function doForgotPassword() {
 }
 
 // Reset OTP input handlers
+function showResetPanel() {
+  ['panelLogin','panelRegister','panelForgot','panelReset'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  const panel = document.getElementById('panelReset');
+  if (panel) panel.classList.add('active');
+  document.getElementById('btnLogin').classList.remove('active');
+  document.getElementById('btnReg').classList.remove('active');
+  document.querySelectorAll('#panelReset .otp-input').forEach(i => i.value = '');
+  setTimeout(() => document.getElementById('rotp1')?.focus(), 100);
+}
+
 function rotpMove(el, idx) {
   el.value = el.value.slice(-1).replace(/[^0-9]/g,'');
   if (el.value && idx < 5) {

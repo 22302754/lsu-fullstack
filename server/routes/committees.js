@@ -53,7 +53,7 @@ router.post('/join', async (req, res) => {
         <p><b>السبب:</b> ${reason}</p>
         <br>
         <a href="${waLink}" style="background:#25D366;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin-left:10px">
-          💬 واتساب ${head.name}
+          💬 واتساب ${head.name} (+${head.phone})
         </a>
         <a href="${process.env.FRONTEND_URL}/admin" style="background:#1a7a2e;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block">
           📊 لوحة التحكم
@@ -74,7 +74,7 @@ router.post('/join', async (req, res) => {
         <p><b>السبب:</b> ${reason}</p>
         <br>
         <a href="https://wa.me/${phone.replace(/[^0-9]/g,'')}" style="background:#25D366;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none">
-          💬 تواصل مع الطالب عبر واتساب
+          💬 تواصل مع الطالب عبر واتساب (${phone})
         </a>
       </div>`
     });
