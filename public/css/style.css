@@ -985,3 +985,58 @@ html[dir="ltr"] .eye-btn {
   font-weight: 700;
   transition: all .3s;
 }
+
+/* ===================== FORGOT PASSWORD & BACK BTN ===================== */
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none; border: none; color: var(--text2);
+  font-family: 'Tajawal', sans-serif; font-size: .88rem;
+  cursor: pointer; padding: 0 0 16px 0; transition: color .25s;
+}
+.back-btn:hover { color: var(--green-light); }
+
+.forgot-row {
+  text-align: left; margin: 8px 0 4px;
+}
+html[dir="rtl"] .forgot-row { text-align: right; }
+
+.forgot-link {
+  font-size: .82rem; color: var(--text3); cursor: pointer;
+  text-decoration: none; transition: color .25s;
+}
+.forgot-link:hover { color: var(--green-light); }
+
+.forgot-desc {
+  font-size: .85rem; color: var(--text2);
+  line-height: 1.7; margin-bottom: 4px;
+}
+
+/* ===================== WHATSAPP FLOATING BUTTON ===================== */
+.wa-float {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  background: #25D366;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 24px rgba(37,211,102,0.5);
+  z-index: 500;
+  text-decoration: none;
+  transition: all .3s;
+  animation: wa-pulse 3s ease-in-out infinite;
+}
+body.ltr .wa-float { left: auto; right: 28px; }
+.wa-float:hover {
+  transform: scale(1.12) translateY(-3px);
+  box-shadow: 0 10px 30px rgba(37,211,102,0.65);
+  animation: none;
+}
+@keyframes wa-pulse {
+  0%, 100% { box-shadow: 0 6px 24px rgba(37,211,102,0.5); }
+  50%       { box-shadow: 0 6px 36px rgba(37,211,102,0.7); }
+}
+
+/* Scroll to top btn moves up to not overlap with WhatsApp btn */
+.scroll-top-btn { bottom: 96px !important; left: 28px; }
+body.ltr .scroll-top-btn { left: auto; right: 28px; }

@@ -92,8 +92,12 @@ function toggleSidebar() {
 
 // ===== AUTH MODAL =====
 function switchTab(tab) {
-  document.getElementById('panelLogin').classList.toggle('active', tab === 'login');
-  document.getElementById('panelRegister').classList.toggle('active', tab === 'register');
+  ['panelLogin','panelRegister','panelForgot'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  const target = document.getElementById('panel' + tab.charAt(0).toUpperCase() + tab.slice(1));
+  if (target) target.classList.add('active');
   document.getElementById('btnLogin').classList.toggle('active', tab === 'login');
   document.getElementById('btnReg').classList.toggle('active', tab === 'register');
 }
@@ -190,8 +194,17 @@ async function doLogin() {
     const data = await res.json();
 
     if (data.success) {
-      pendingUserId = data.userId;
-      show2FA();
+      if (data.skipOTP) {
+        // Session still valid - skip 2FA directly
+        localStorage.setItem('lsu_token', data.token);
+        localStorage.setItem('lsu_user', JSON.stringify(data.user));
+        const userName = data.user?.name || data.user?.firstName || '';
+        updateSidebarUser(userName, data.user?.membershipId || '');
+        enterSite(userName);
+      } else {
+        pendingUserId = data.userId;
+        show2FA();
+      }
     } else {
       alert(data.message);
     }
@@ -212,17 +225,20 @@ function show2FA() {
   document.querySelectorAll('.otp-input')[0]?.focus();
 }
 
+let otpAutoVerifyTimer = null;
+
 function otpMove(el, idx) {
   // Keep only single digit
   el.value = el.value.slice(-1).replace(/[^0-9]/g,'');
   if (el.value && idx < 5) {
     document.querySelectorAll('.otp-input')[idx + 1]?.focus();
   }
-  // Auto-verify if all 6 filled
+  // Auto-verify only once when all 6 filled
   const inputs = document.querySelectorAll('.otp-input');
   const code = Array.from(inputs).map(i => i.value).join('');
   if (code.length === 6 && /^[0-9]{6}$/.test(code)) {
-    setTimeout(() => verifyOTP(), 300);
+    clearTimeout(otpAutoVerifyTimer);
+    otpAutoVerifyTimer = setTimeout(() => verifyOTP(), 400);
   }
 }
 
@@ -407,7 +423,7 @@ const T = {
     contactDesc:'لا تتردد في التواصل معنا لأي استفسار أو طلب مساعدة',
     cEmail:'البريد الإلكتروني', cWhatsapp:'واتساب', cSocial:'إنستقرام', cLocation:'الموقع',
     fAbout:'عن الاتحاد', fLeader:'القيادة', fComm:'اللجان', fContact:'تواصل',
-    footerText:'© 2026 اتحاد الطلبة الليبيين في قبرص التركية · جميع الحقوق محفوظة'
+    footerText:'© 2026 اتحاد الطلبة الليبيين في قبرص التركية · جميع الحقوق محفوظة', forgotLink:'نسيت كلمة المرور؟', backBtnText:'رجوع', tfaBackText:'رجوع', forgotDesc:'أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور', lForgotEmail:'البريد الإلكتروني', btnForgotSubmit:'إرسال رابط الإعادة'
   },
   en: {
     langBtn:'AR', mTitle:'Libyan Students Union', mSub:'Turkish Cyprus · قبرص التركية',
@@ -461,7 +477,7 @@ const T = {
     contactDesc:'Do not hesitate to reach out for any inquiry or assistance.',
     cEmail:'Email', cWhatsapp:'WhatsApp', cSocial:'Instagram', cLocation:'Location',
     fAbout:'About', fLeader:'Leadership', fComm:'Committees', fContact:'Contact',
-    footerText:'© 2026 Libyan Students Union in Turkish Cyprus · All Rights Reserved'
+    footerText:'© 2026 Libyan Students Union in Turkish Cyprus · All Rights Reserved', forgotLink:'Forgot Password?', backBtnText:'Back', tfaBackText:'Back', forgotDesc:'Enter your email and we will send you a password reset link', lForgotEmail:'Email Address', btnForgotSubmit:'Send Reset Link'
   }
 };
 
@@ -626,6 +642,49 @@ function closeAllAcc() {
   // Scroll sidebar to top
   const sidebar = document.getElementById('sidebar');
   if (sidebar) sidebar.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+// ===== FORGOT PASSWORD =====
+function showForgotPanel() {
+  document.getElementById('panelLogin').classList.remove('active');
+  document.getElementById('panelForgot').classList.add('active');
+  document.getElementById('btnLogin').classList.remove('active');
+}
+
+async function doForgotPassword() {
+  const email = document.getElementById('forgotEmail')?.value;
+  if (!email) { alert(isArabic ? 'أدخل بريدك الإلكتروني' : 'Enter your email'); return; }
+
+  const btn = document.getElementById('btnForgotSubmit');
+  btn.disabled = true;
+  btn.textContent = isArabic ? 'جارٍ الإرسال...' : 'Sending...';
+
+  try {
+    const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    const msg = document.getElementById('forgotSuccess');
+    msg.style.display = 'block';
+    msg.textContent = isArabic
+      ? '✓ إذا كان البريد مسجلاً ستصلك رسالة قريباً'
+      : '✓ If this email is registered, you will receive a reset link';
+  } catch(e) {
+    alert(isArabic ? 'خطأ في الاتصال' : 'Connection error');
+  }
+
+  btn.disabled = false;
+  btn.textContent = isArabic ? 'إرسال رابط الإعادة' : 'Send Reset Link';
+}
+
+// ===== BACK FROM 2FA =====
+function backFromTFA() {
+  document.getElementById('twoFAModal').style.display = 'none';
+  document.getElementById('authModal').style.display = 'flex';
+  switchTab('login');
 }
 
 // ===== ACCORDION SIDEBAR =====

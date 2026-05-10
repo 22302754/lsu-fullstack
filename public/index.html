@@ -2,7 +2,6 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="google-site-verification" content="HwrQKcNGJAFTR6KreNNpdCc4VziQe3LG2ihgTkbjZe0" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="description" content="اتحاد الطلبة الليبيين في قبرص التركية - منظمة طلابية مستقلة تأسست عام 2026 لخدمة الطلبة الليبيين">
 <meta name="keywords" content="اتحاد الطلبة الليبيين, قبرص التركية, Libyan Students Union, Turkish Cyprus, LSU">
@@ -49,8 +48,25 @@
           </div>
         </div>
       </div>
+      <div class="forgot-row">
+        <a onclick="showForgotPanel()" id="forgotLink" class="forgot-link">نسيت كلمة المرور؟</a>
+      </div>
       <button class="btn-primary" onclick="doLogin()" id="btnLoginSubmit">دخول</button>
       <p class="enter-as-guest"><span id="guestTxt">أو </span><a onclick="enterSite()" id="guestLink">تصفح كزائر</a></p>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div class="form-panel" id="panelForgot">
+      <button class="back-btn" onclick="switchTab('login')">← <span id="backBtnText">رجوع</span></button>
+      <div class="form-stack">
+        <p class="forgot-desc" id="forgotDesc">أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور</p>
+        <div class="field">
+          <label id="lForgotEmail">البريد الإلكتروني</label>
+          <input type="email" id="forgotEmail" placeholder="student@university.edu">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="doForgotPassword()" id="btnForgotSubmit">إرسال رابط الإعادة</button>
+      <div class="success-msg" id="forgotSuccess">✓ تم إرسال الرابط! تفقد بريدك الإلكتروني</div>
     </div>
 
     <!-- REGISTER -->
@@ -119,6 +135,7 @@
 <!-- ===== 2FA MODAL ===== -->
 <div id="twoFAModal">
   <div class="modal-box twofa-box">
+    <button class="back-btn" onclick="backFromTFA()" id="tfaBackBtn">← <span id="tfaBackText">رجوع</span></button>
     <div class="twofa-icon">🔐</div>
     <h2 class="modal-title" id="tfaTitle">التحقق من الهوية</h2>
     <p class="modal-subtitle" id="tfaSub">أدخل الرمز المُرسل إلى بريدك الإلكتروني</p>
@@ -517,6 +534,14 @@
 
 <!-- ===== SCROLL TO TOP ===== -->
 <button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="العودة للأعلى">↑</button>
+
+
+<!-- ===== WHATSAPP FLOAT ===== -->
+<a href="https://wa.me/905428806087" target="_blank" class="wa-float" id="waFloat" title="تواصل معنا على واتساب">
+  <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+    <path d="M16 2C8.268 2 2 8.268 2 16c0 2.4.636 4.65 1.748 6.6L2 30l7.6-1.724A13.93 13.93 0 0016 30c7.732 0 14-6.268 14-14S23.732 2 16 2zm0 25.2c-2.14 0-4.14-.576-5.86-1.58l-.42-.248-4.512 1.024 1.048-4.388-.272-.44A11.17 11.17 0 014.8 16C4.8 9.816 9.816 4.8 16 4.8S27.2 9.816 27.2 16 22.184 27.2 16 27.2zm6.12-8.32c-.336-.168-1.984-.98-2.292-1.092-.308-.112-.532-.168-.756.168-.224.336-.868 1.092-1.064 1.316-.196.224-.392.252-.728.084-.336-.168-1.42-.524-2.704-1.668-1-.896-1.676-2.004-1.872-2.34-.196-.336-.02-.52.148-.688.152-.152.336-.392.504-.588.168-.196.224-.336.336-.56.112-.224.056-.42-.028-.588-.084-.168-.756-1.82-1.036-2.492-.272-.66-.548-.568-.756-.58h-.644c-.224 0-.588.084-.896.42-.308.336-1.176 1.148-1.176 2.8 0 1.652 1.204 3.248 1.372 3.472.168.224 2.372 3.62 5.748 4.956.804.348 1.432.556 1.92.712.808.256 1.544.22 2.124.132.648-.1 1.984-.812 2.264-1.596.28-.784.28-1.456.196-1.596-.08-.14-.308-.224-.644-.392z" fill="white"/>
+  </svg>
+</a>
 
 </body>
 </html>
