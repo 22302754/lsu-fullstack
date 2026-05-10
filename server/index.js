@@ -37,8 +37,14 @@ app.use('/api/committees', require('./routes/committees'));
 app.use('/api/admin',      require('./routes/admin'));
 
 // ── Serve Frontend ──
-app.get('/admin*', (req, res) => res.sendFile(path.join(__dirname, '../admin/index.html')));
-app.get('*',       (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
+app.get('/admin*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../admin/index.html'));
+});
+
+// Important: do NOT catch API routes
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
 
 // ── Error Handler ──
 app.use((err, req, res, next) => {
