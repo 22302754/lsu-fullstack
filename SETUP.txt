@@ -1,0 +1,50 @@
+============================================
+ اتحاد الطلبة الليبيين - دليل الإعداد السريع
+ LSU-TC Full Stack Setup Guide
+============================================
+
+STEP 1 — Install Node.js
+  → Download from: https://nodejs.org
+  → Choose "LTS" version and install
+
+STEP 2 — Install project packages
+  → Open this folder in terminal/cmd
+  → Run: npm install
+
+STEP 3 — Set up MongoDB (Free Database)
+  → Go to: https://mongodb.com/atlas
+  → Sign up free → Create Cluster (M0 Free)
+  → Database Access → Add User → save username & password
+  → Network Access → Add 0.0.0.0/0
+  → Connect → copy connection string
+  → Paste into .env file: MONGODB_URI=...
+
+STEP 4 — Set up Gmail
+  → Go to: myaccount.google.com/security
+  → Enable 2-Step Verification
+  → Search "App Passwords" → Generate for "Mail"
+  → Copy 16-char password → paste in .env: EMAIL_PASS=...
+
+STEP 5 — Edit .env file
+  → Open .env with any text editor (Notepad)
+  → Fill in MONGODB_URI and EMAIL_PASS
+  → Change ADMIN_PASSWORD to something secure
+
+STEP 6 — Create admin account
+  → Run: npm run seed
+
+STEP 7 — Start the server
+  → Run: npm run dev
+  → Open browser: http://localhost:5000
+  → Admin panel: http://localhost:5000/admin
+
+STEP 8 — Deploy online (Free on Render.com)
+  → Upload to GitHub
+  → Go to render.com → New Web Service
+  → Connect GitHub → Build: npm install → Start: npm start
+  → Add all .env variables in Render dashboard
+  → Done! Your site is live.
+
+============================================
+ For help: libyanittihad@gmail.com
+============================================
