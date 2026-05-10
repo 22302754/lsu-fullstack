@@ -236,44 +236,31 @@ function show2FA() {
 let otpAutoVerifyTimer = null;
 
 function otpMove(el, idx) {
-
-  // allow only numbers
-  el.value = el.value.replace(/[^0-9]/g, '').slice(0,1);
-
+  // Keep only single digit
+  el.value = el.value.slice(-1).replace(/[^0-9]/g,'');
+  if (el.value && idx < 5) {
+    document.querySelectorAll('.otp-input')[idx + 1]?.focus();
+  }
+  // Auto-verify only once when all 6 filled
   const inputs = document.querySelectorAll('.otp-input');
-
-  // auto move to next input
-  if (el.value && idx < inputs.length - 1) {
-    inputs[idx + 1].focus();
-  }
-
-  // auto verify when complete
   const code = Array.from(inputs).map(i => i.value).join('');
-
   if (code.length === 6 && /^[0-9]{6}$/.test(code)) {
-
     clearTimeout(otpAutoVerifyTimer);
-
-    otpAutoVerifyTimer = setTimeout(() => {
-      verifyOTP();
-    }, 300);
-
+    otpAutoVerifyTimer = setTimeout(() => verifyOTP(), 400);
   }
-
 }
 
 function otpKey(e, idx) {
-
   const inputs = document.querySelectorAll('.otp-input');
-
   if (e.key === 'Backspace') {
-
-    if (!inputs[idx].value && idx > 0) {
-      inputs[idx - 1].focus();
-    }
-
+    inputs[idx].value = '';
+    if (idx > 0) inputs[idx - 1]?.focus();
+    e.preventDefault();
+  } else if (e.key === 'ArrowLeft' && idx > 0) {
+    inputs[idx - 1]?.focus();
+  } else if (e.key === 'ArrowRight' && idx < 5) {
+    inputs[idx + 1]?.focus();
   }
-
 }
 
 function otpPaste(e) {
