@@ -10,6 +10,8 @@ const path        = require('path');
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 // ── Security ──
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: true, credentials: true })); // Allow all origins
