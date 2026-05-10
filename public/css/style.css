@@ -1217,3 +1217,89 @@ nav.scrolled {
   backdrop-filter: none !important;
   box-shadow: 0 2px 20px rgba(0,0,0,0.12) !important;
 }
+
+/* ===================== NAVBAR FINAL REDESIGN ===================== */
+nav {
+  background: rgba(5,20,5,0.97) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(26,122,46,0.3) !important;
+  box-shadow: 0 2px 30px rgba(0,0,0,0.5) !important;
+  height: 70px !important;
+}
+
+[data-theme="light"] nav {
+  background: rgba(255,255,255,0.97) !important;
+  border-bottom: 1px solid rgba(26,122,46,0.2) !important;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* Nav logo text always visible */
+.nav-logo-text span {
+  color: #ffffff !important;
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+}
+[data-theme="light"] .nav-logo-text span { color: #0d1a0f !important; }
+
+.nav-logo-text small {
+  color: rgba(255,255,255,0.5) !important;
+}
+[data-theme="light"] .nav-logo-text small { color: rgba(0,0,0,0.4) !important; }
+
+/* Buttons always visible */
+.lang-btn {
+  background: rgba(26,122,46,0.2) !important;
+  border: 1px solid rgba(26,122,46,0.5) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+[data-theme="light"] .lang-btn {
+  background: rgba(26,122,46,0.08) !important;
+  border: 1px solid rgba(26,122,46,0.3) !important;
+  color: #0d1a0f !important;
+}
+.lang-btn:hover {
+  background: var(--green) !important;
+  color: #fff !important;
+}
+
+.hamburger-btn span { background: #ffffff !important; }
+[data-theme="light"] .hamburger-btn span { background: #0d1a0f !important; }
+
+.theme-btn {
+  background: rgba(26,122,46,0.15) !important;
+  border: 1px solid rgba(26,122,46,0.4) !important;
+  color: #fff !important;
+}
+[data-theme="light"] .theme-btn { color: #0d1a0f !important; }
+
+/* ===================== ACCORDION SPACING FIX ===================== */
+.acc-item {
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.acc-header {
+  padding: 18px 22px !important;
+  font-size: 1.02rem !important;
+  gap: 14px !important;
+}
+
+.acc-body {
+  background: rgba(0,0,0,0.08) !important;
+}
+[data-theme="light"] .acc-body { background: rgba(0,0,0,0.03) !important; }
+
+.acc-body .sidebar-link {
+  padding: 14px 22px 14px 32px !important;
+  font-size: .96rem !important;
+  border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+}
+[data-theme="light"] .acc-body .sidebar-link {
+  border-bottom: 1px solid rgba(0,0,0,0.04) !important;
+}
+body.ltr .acc-body .sidebar-link { padding: 14px 32px 14px 22px !important; }
+
+/* ===================== HERO OFFSET ===================== */
+#hero { padding-top: 70px !important; }
+section { scroll-margin-top: 74px !important; }
