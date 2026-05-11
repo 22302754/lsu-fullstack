@@ -28,6 +28,12 @@
     </div>
     <h2 class="modal-title" id="mTitle">اتحاد الطلبة الليبيين</h2>
     <p class="modal-subtitle" id="mSub">قبرص التركية · Turkish Cyprus</p>
+
+    <!-- Modal Settings Bar -->
+    <div class="modal-settings-bar">
+      <button class="modal-theme-btn" onclick="toggleTheme()" id="modalThemeBtn" title="تبديل الوضع">🌙</button>
+      <button class="modal-lang-btn" onclick="toggleLang()" id="modalLangBtn">EN / عربي</button>
+    </div>
     <div class="tab-buttons">
       <button class="tab-btn active" onclick="switchTab('login')" id="btnLogin">تسجيل الدخول</button>
       <button class="tab-btn" onclick="switchTab('register')" id="btnReg">عضوية جديدة</button>
@@ -138,8 +144,12 @@
         <div class="field">
           <label id="lYear">السنة الدراسية</label>
           <select id="rYear">
-            <option>السنة الأولى</option><option>السنة الثانية</option>
-            <option>السنة الثالثة</option><option>السنة الرابعة</option>
+            <option>السنة الأولى</option>
+            <option>السنة الثانية</option>
+            <option>السنة الثالثة</option>
+            <option>السنة الرابعة</option>
+            <option>السنة الخامسة</option>
+            <option>السنة السادسة</option>
             <option>الدراسات العليا</option>
           </select>
         </div>
@@ -423,7 +433,7 @@
       <div class="field"><label id="cml2">رقم الطالب</label><input type="text" id="cStudentId" placeholder="2024XXXXX"></div>
       <div class="field"><label id="cml3">الجامعة والتخصص</label><input type="text" id="cUniSpec" placeholder="EMU - هندسة"></div>
       <div class="field"><label id="cml4">رقم الهاتف / واتساب</label><input type="tel" id="cPhone" placeholder="+90 5XX XXX XXXX"></div>
-      <div class="field"><label id="cml5">لماذا تريد الانضمام؟</label><input type="text" id="cReason" placeholder="أملك خبرة في التصوير..."></div>
+      <div class="field"><label id="cml5">لماذا تريد الانضمام؟</label><input type="text" id="cReason" placeholder="لدي خبرة في التنظيم وإدارة الفعاليات..." id="cReasonInput"></div>
     </div>
     <button class="btn-primary" onclick="submitCommitteeJoin()" id="cSubmitBtn">إرسال الطلب</button>
     <div class="success-msg" id="cSuccessMsg">✓ تم إرسال طلبك! سيتواصل معك رئيس اللجنة قريباً</div>

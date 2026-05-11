@@ -20,10 +20,13 @@ function toggleTheme() {
   isDark = !isDark;
   document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
   const icon = isDark ? '🌙' : '☀️';
-  const themeBtn  = document.getElementById('themeBtn');
-  const sideIcon  = document.getElementById('sidebarThemeIcon');
-  const sideText  = document.getElementById('sidebarThemeText');
-  if (themeBtn) themeBtn.textContent = icon;
+  // Update all theme buttons
+  ['themeBtn','modalThemeBtn'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = icon;
+  });
+  const sideIcon = document.getElementById('sidebarThemeIcon');
+  const sideText = document.getElementById('sidebarThemeText');
   if (sideIcon) sideIcon.textContent = icon;
   if (sideText) sideText.textContent = isDark ? (isArabic ? 'الوضع الليلي' : 'Dark Mode') : (isArabic ? 'الوضع النهاري' : 'Light Mode');
 }
@@ -293,12 +296,29 @@ async function verifyOTP() {
     if (data.success) {
       localStorage.setItem('lsu_token', data.token);
       localStorage.setItem('lsu_user', JSON.stringify(data.user));
+      // Clear inputs and show success
+      document.querySelectorAll('.otp-input').forEach(i => { i.value=''; i.style.borderColor=''; });
       document.getElementById('tfaSuccess').style.display = 'block';
       const userName = data.user?.name || data.user?.firstName || '';
       updateSidebarUser(userName, data.user?.membershipId || '');
       setTimeout(() => enterSite(userName), 1500);
     } else {
-      alert(data.message);
+      // Show error on inputs - shake effect, don't alert
+      document.querySelectorAll('.otp-input').forEach(i => {
+        i.style.borderColor = '#dc3545';
+        i.value = '';
+      });
+      document.querySelectorAll('.otp-input')[0]?.focus();
+      // Show inline error instead of alert
+      const sub = document.getElementById('tfaSub');
+      if (sub) {
+        sub.textContent = isArabic ? '❌ الرمز غير صحيح، حاول مجدداً' : '❌ Wrong code, try again';
+        sub.style.color = '#dc3545';
+        setTimeout(() => {
+          sub.textContent = isArabic ? 'أدخل الرمز المُرسل إلى بريدك الإلكتروني' : 'Enter the code sent to your email';
+          sub.style.color = '';
+        }, 3000);
+      }
     }
   } catch (err) {
     alert(isArabic ? 'خطأ في التحقق' : 'Verification error');
@@ -508,6 +528,14 @@ function toggleLang() {
   styleEl.textContent = isArabic
     ? `.sidebar{right:-310px;left:auto}.sidebar.open{right:0;left:auto}.sidebar-link{text-align:right}.sidebar-link::before{right:0;left:auto}`
     : `.sidebar{left:-310px;right:auto}.sidebar.open{left:0;right:auto}.sidebar-link{text-align:left}.sidebar-link::before{left:0;right:auto}`;
+
+  // Update modal lang button
+  const modalLangBtn = document.getElementById('modalLangBtn');
+  if (modalLangBtn) modalLangBtn.textContent = isArabic ? 'EN / عربي' : 'عربي / EN';
+
+  // Update modal theme button
+  const modalThemeBtn = document.getElementById('modalThemeBtn');
+  if (modalThemeBtn) modalThemeBtn.textContent = isDark ? '🌙' : '☀️';
 }
 
 // ===== INTERSECTION OBSERVER =====
