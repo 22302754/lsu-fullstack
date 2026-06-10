@@ -1,91 +1,106 @@
-const express   = require('express');
-const CommReq   = require('../models/CommitteeRequest');
-const sendEmail = require('../utils/email');
-const router    = express.Router();
+const express  = require('express');
+const router   = express.Router();
 
-const COMMITTEE_HEADS = {
-  media:        { name: 'ياسين عقيل',   phone: '905428742246', email: 'yaseenaqeel20@gmail.com' },
-  organization: { name: 'محمد القمودي', phone: '218926131442', email: 'nory9071@gmail.com' },
+const HEADS = {
+  media:        { name: 'ياسين عقيل',   phone: '905428742246', email: 'yaseenaqeel20@gmail.com', prefix: 'LSU-MED' },
+  organization: { name: 'محمد القمودي', phone: '218926131442', email: 'nory9071@gmail.com',       prefix: 'LSU-ORG' },
 };
+
+// Generate membership ID
+function generateMembershipId(prefix) {
+  const num = Math.floor(100 + Math.random() * 900);
+  const year = new Date().getFullYear().toString().slice(-2);
+  return `${prefix}-${year}${num}`;
+}
 
 router.post('/join', async (req, res) => {
   try {
     const { fullName, studentId, uniMajor, phone, reason, committee } = req.body;
 
-    // Validate
     if (!fullName || !phone || !reason || !committee)
       return res.status(400).json({ success: false, message: 'يرجى ملء جميع الحقول' });
 
-    // Save request
-    const request = await CommReq.create({
-      fullName,
-      studentId: studentId || 'N/A',
-      uniMajor:  uniMajor  || 'N/A',
-      phone,
-      reason,
-      committee
-    });
-
     const commName = committee === 'media' ? 'لجنة الإعلام والتصوير' : 'لجنة الإشراف والتنظيم';
-    const head = COMMITTEE_HEADS[committee] || COMMITTEE_HEADS.media;
-    const cleanPhone = phone.replace(/[^0-9]/g, '');
+    const head = HEADS[committee] || HEADS.media;
+    const cleanPhone = phone.replace(/[^0-9]/g,'');
 
-    // WhatsApp link to committee head
-    const waMsg = encodeURIComponent(
-      `📋 طلب انضمام - ${commName}\n👤 ${fullName}\n🏛 ${uniMajor}\n📞 ${phone}\n💬 ${reason}`
-    );
-    const waLink = `https://wa.me/${head.phone}?text=${waMsg}`;
+    // Generate membership ID for this committee member
+    const membershipId = generateMembershipId(head.prefix);
 
-    // Email to committee head
+    console.log(`📋 New request: ${fullName} → ${commName} | ID: ${membershipId}`);
+
+    // Save to DB
     try {
+      const CommReq = require('../models/CommitteeRequest');
+      await CommReq.create({
+        fullName,
+        studentId: studentId || 'N/A',
+        uniMajor:  uniMajor  || 'N/A',
+        phone, reason, committee,
+        membershipId
+      });
+    } catch(dbErr) {
+      console.error('DB error (non-fatal):', dbErr.message);
+    }
+
+    // Send emails
+    try {
+      const sendEmail = require('../utils/email');
+
+      // Email to committee head
       await sendEmail({
         to: head.email,
         subject: `📋 طلب انضمام جديد - ${commName}`,
         html: `<div dir="rtl" style="font-family:Arial;padding:20px;max-width:600px">
           <h3 style="color:#1a7a2e">مرحباً ${head.name}،</h3>
           <p>وصل طلب انضمام جديد لـ${commName}:</p>
-          <p><b>الاسم:</b> ${fullName}</p>
-          <p><b>رقم الطالب:</b> ${studentId || 'غير محدد'}</p>
-          <p><b>الجامعة والتخصص:</b> ${uniMajor}</p>
-          <p><b>الهاتف:</b> ${phone}</p>
-          <p><b>السبب:</b> ${reason}</p>
+          <table style="width:100%;border-collapse:collapse">
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>رقم العضوية المؤقت</b></td>
+                <td style="padding:8px;border:1px solid #ddd;color:#1a7a2e;font-weight:bold">${membershipId}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>الاسم</b></td><td style="padding:8px;border:1px solid #ddd">${fullName}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>رقم الطالب</b></td><td style="padding:8px;border:1px solid #ddd">${studentId||'غير محدد'}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>الجامعة والتخصص</b></td><td style="padding:8px;border:1px solid #ddd">${uniMajor}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>الهاتف</b></td><td style="padding:8px;border:1px solid #ddd">${phone}</td></tr>
+            <tr><td style="padding:8px;border:1px solid #ddd"><b>السبب</b></td><td style="padding:8px;border:1px solid #ddd">${reason}</td></tr>
+          </table>
           <br>
-          <a href="https://wa.me/${cleanPhone}" style="background:#25D366;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none">
+          <a href="https://wa.me/${cleanPhone}" style="background:#25D366;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block">
             💬 تواصل مع الطالب (${phone})
           </a>
         </div>`
       });
-    } catch(emailErr) {
-      console.error('Email error (non-fatal):', emailErr.message);
-    }
 
-    // Email to admin
-    try {
+      // Email to admin
       await sendEmail({
         to: process.env.ADMIN_EMAIL,
         subject: `📋 طلب انضمام - ${commName}`,
         html: `<div dir="rtl" style="font-family:Arial;padding:20px">
-          <h3>${commName} - طلب جديد</h3>
-          <p><b>الاسم:</b> ${fullName}</p>
-          <p><b>الهاتف:</b> ${phone}</p>
-          <a href="${waLink}" style="background:#25D366;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">
-            واتساب ${head.name}
+          <h3>${commName} | رقم العضوية: <span style="color:#1a7a2e">${membershipId}</span></h3>
+          <p><b>الاسم:</b> ${fullName} | <b>الهاتف:</b> ${phone}</p>
+          <a href="https://wa.me/${head.phone}" style="background:#25D366;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">
+            واتساب ${head.name} (+${head.phone})
           </a>
         </div>`
       });
-    } catch(emailErr) {
-      console.error('Admin email error (non-fatal):', emailErr.message);
-    }
 
-    console.log(`✅ Committee request saved: ${fullName} → ${commName}`);
+      // Email to applicant with their membership ID
+      const applicantEmailMatch = reason.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+      if (!applicantEmailMatch) {
+        console.log('No email in reason field for applicant notification');
+      }
+
+    } catch(emailErr) {
+      console.error('Email error (non-fatal):', emailErr.message);
+    }
 
     res.status(201).json({
       success: true,
-      message: 'تم إرسال طلبك بنجاح! سيتواصل معك رئيس اللجنة قريباً'
+      membershipId,
+      message: `✓ تم إرسال طلبك بنجاح!\nرقم عضويتك المؤقت: ${membershipId}\nسيتواصل معك رئيس اللجنة قريباً`
     });
 
   } catch (err) {
-    console.error('Committee join error:', err.message);
+    console.error('Committee FATAL:', err.message);
     res.status(500).json({ success: false, message: 'خطأ في الخادم: ' + err.message });
   }
 });

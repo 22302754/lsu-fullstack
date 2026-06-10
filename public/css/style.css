@@ -1454,3 +1454,23 @@ section { scroll-margin-top: 74px !important; }
   border-color: var(--green);
   color: #fff;
 }
+
+/* ===================== MEMBERSHIP ID BADGE ===================== */
+.member-id-badge {
+  display: inline-block;
+  background: rgba(26,122,46,0.12);
+  border: 1px solid rgba(26,122,46,0.3);
+  color: var(--green-light);
+  font-size: .72rem;
+  font-family: 'Cormorant Garamond', serif;
+  letter-spacing: 2px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-top: 6px;
+}
+.member-id-badge.small {
+  font-size: .65rem;
+  padding: 2px 8px;
+  margin-top: 3px;
+  display: block;
+}

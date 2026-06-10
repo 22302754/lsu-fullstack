@@ -13,6 +13,19 @@
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://lsu-tc.org">
 <title>اتحاد الطلبة الليبيين في قبرص التركية | Libyan Students Union</title>
+<meta property="og:title" content="اتحاد الطلبة الليبيين في قبرص التركية">
+<meta property="og:description" content="منظمة طلابية مستقلة تأسست 2026 لخدمة الطلبة الليبيين في قبرص التركية">
+<meta property="og:image" content="https://libyanstudentscyprus.com/assets/logo.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:url" content="https://libyanstudentscyprus.com">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ar_LY">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="اتحاد الطلبة الليبيين في قبرص التركية">
+<meta name="twitter:image" content="https://libyanstudentscyprus.com/assets/logo.png">
+<link rel="icon" type="image/png" href="/assets/logo.png">
+<link rel="apple-touch-icon" href="/assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;900&family=Playfair+Display:wght@600;700;900&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
 
@@ -44,12 +57,12 @@
       <div class="form-stack">
         <div class="field">
           <label id="lEmail">البريد الإلكتروني / رقم الطالب</label>
-          <input type="text" id="loginEmail" placeholder="student@university.edu">
+          <input type="text" id="loginEmail" placeholder="student@university.edu" onkeydown="if(event.key==='Enter') doLogin()">
         </div>
         <div class="field">
           <label id="lPass">كلمة المرور</label>
           <div class="pass-field">
-            <input type="password" id="loginPass" placeholder="••••••••">
+            <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()">
             <button type="button" class="eye-btn" onclick="togglePass('loginPass',this)">👁</button>
           </div>
         </div>
@@ -185,12 +198,12 @@
     <h2 class="modal-title" id="tfaTitle">التحقق من الهوية</h2>
     <p class="modal-subtitle" id="tfaSub">أدخل الرمز المُرسل إلى بريدك الإلكتروني</p>
     <div class="otp-row">
-      <input class="otp-input" type="number" min="0" max="9" id="otp1" oninput="otpMove(this,0)" onkeydown="otpKey(event,0)" onpaste="otpPaste(event)">
-      <input class="otp-input" type="number" min="0" max="9" id="otp2" oninput="otpMove(this,1)" onkeydown="otpKey(event,1)">
-      <input class="otp-input" type="number" min="0" max="9" id="otp3" oninput="otpMove(this,2)" onkeydown="otpKey(event,2)">
-      <input class="otp-input" type="number" min="0" max="9" id="otp4" oninput="otpMove(this,3)" onkeydown="otpKey(event,3)">
-      <input class="otp-input" type="number" min="0" max="9" id="otp5" oninput="otpMove(this,4)" onkeydown="otpKey(event,4)">
-      <input class="otp-input" type="number" min="0" max="9" id="otp6" oninput="otpMove(this,5)" onkeydown="otpKey(event,5)">
+      <input class="otp-input" type="text" inputmode="numeric" maxlength="1" id="otp1" oninput="otpMove(this,0)" onkeydown="otpKey(event,0)" onpaste="otpPaste(event)">
+      <input class="otp-input" type="text" inputmode="numeric" maxlength="1" id="otp2" oninput="otpMove(this,1)" onkeydown="otpKey(event,1)">
+      <input class="otp-input" type="text" inputmode="numeric" maxlength="1" id="otp3" oninput="otpMove(this,2)" onkeydown="otpKey(event,2)">
+      <input class="otp-input" type="text" inputmode="numeric" maxlength="1" id="otp4" oninput="otpMove(this,3)" onkeydown="otpKey(event,3)">
+      <input class="otp-input" type="text" inputmode="numeric" maxlength="1" id="otp5" oninput="otpMove(this,4)" onkeydown="otpKey(event,4)">
+      <input class="otp-input" type="text" inputmode="numeric" maxlength="1" id="otp6" oninput="otpMove(this,5)" onkeydown="otpKey(event,5)">
     </div>
     <p class="tfa-resend" id="tfaResend">لم يصلك الرمز؟ <a onclick="resendOTP()">إعادة الإرسال</a></p>
     <button class="btn-primary" onclick="verifyOTP()" id="tfaVerifyBtn">تحقق والدخول</button>
@@ -372,22 +385,24 @@
         <div class="leader-badge gold" id="presidentBadge">رئيس الاتحاد</div>
         <h3 class="leader-name">محمد قرقاب</h3>
         <p class="leader-name-en">Mohamed Qrqab</p>
+        <div class="member-id-badge">LSU-001</div>
       </div>
       <div class="leader-card vice">
         <div class="leader-avatar green">أ.ز</div>
         <div class="leader-badge green" id="viceBadge">نائب الرئيس</div>
         <h3 class="leader-name">أنس الزايدي</h3>
         <p class="leader-name-en">Anas Al-Zaidi</p>
+        <div class="member-id-badge">LSU-002</div>
       </div>
     </div>
     <p class="section-label centered" id="boardLabel">مجلس الإدارة</p>
     <div class="board-grid">
-      <div class="board-card"><div class="board-avatar">م.ق</div><div class="board-name">محمد القمودي</div><div class="board-role" id="r1">عضو مجلس الإدارة</div></div>
-      <div class="board-card"><div class="board-avatar">ع.د</div><div class="board-name">عبد الرؤوف الدروقي</div><div class="board-role" id="r2">عضو مجلس الإدارة</div></div>
-      <div class="board-card"><div class="board-avatar">م.ز</div><div class="board-name">محمد زقلوم</div><div class="board-role" id="r3">عضو مجلس الإدارة</div></div>
-      <div class="board-card"><div class="board-avatar">ص.س</div><div class="board-name">صهيب سباقة</div><div class="board-role" id="r4">عضو مجلس الإدارة</div></div>
-      <div class="board-card"><div class="board-avatar">ف.أ</div><div class="board-name">فتحي أبوسواير</div><div class="board-role" id="r5">عضو مجلس الإدارة</div></div>
-      <div class="board-card"><div class="board-avatar">س.ت</div><div class="board-name">سيف التاجوري</div><div class="board-role" id="r6">عضو مجلس الإدارة</div></div>
+      <div class="board-card"><div class="board-avatar">م.ق</div><div class="board-name">محمد القمودي</div><div class="member-id-badge small">LSU-003</div><div class="board-role" id="r1">عضو مجلس الإدارة</div></div>
+      <div class="board-card"><div class="board-avatar">ع.د</div><div class="board-name">عبد الرؤوف الدروقي</div><div class="member-id-badge small">LSU-004</div><div class="board-role" id="r2">عضو مجلس الإدارة</div></div>
+      <div class="board-card"><div class="board-avatar">م.ز</div><div class="board-name">محمد زقلوم</div><div class="member-id-badge small">LSU-005</div><div class="board-role" id="r3">عضو مجلس الإدارة</div></div>
+      <div class="board-card"><div class="board-avatar">ص.س</div><div class="board-name">صهيب سباقة</div><div class="member-id-badge small">LSU-006</div><div class="board-role" id="r4">عضو مجلس الإدارة</div></div>
+      <div class="board-card"><div class="board-avatar">ف.أ</div><div class="board-name">فتحي أبوسواير</div><div class="member-id-badge small">LSU-007</div><div class="board-role" id="r5">عضو مجلس الإدارة</div></div>
+      <div class="board-card"><div class="board-avatar">س.ت</div><div class="board-name">سيف التاجوري</div><div class="member-id-badge small">LSU-008</div><div class="board-role" id="r6">عضو مجلس الإدارة</div></div>
     </div>
   </div>
 </section>
@@ -403,7 +418,7 @@
         <span class="committee-icon">📸</span>
         <h3 class="committee-name" id="comm1Name">لجنة الإعلام والتصوير</h3>
         <div class="committee-head-label" id="comm1HeadLabel">رئيس اللجنة</div>
-        <div class="committee-head-name">ياسين عقيل</div>
+        <div class="committee-head-name">ياسين عقيل <span class="member-id-badge small">LSU-009</span></div>
         <p class="committee-desc" id="comm1Desc">تتولى توثيق فعاليات الاتحاد وتغطيتها إعلامياً، وإدارة حسابات التواصل الاجتماعي، وإنتاج المحتوى المرئي والمصور.</p>
         <button class="btn-join-committee" onclick="openCommitteeModal('media')" id="joinMedia">📩 انضم إلى لجنة الإعلام</button>
       </div>
@@ -411,7 +426,7 @@
         <span class="committee-icon">📋</span>
         <h3 class="committee-name" id="comm2Name">لجنة الإشراف والتنظيم</h3>
         <div class="committee-head-label" id="comm2HeadLabel">رئيس اللجنة</div>
-        <div class="committee-head-name">محمد القمودي</div>
+        <div class="committee-head-name">محمد القمودي <span class="member-id-badge small">LSU-003</span></div>
         <p class="committee-desc" id="comm2Desc">تختص بالإشراف على الفعاليات والأنشطة لوجستياً، وضمان سير الأعمال وفق الخطط المرسومة، والتنسيق بين أجهزة الاتحاد.</p>
         <button class="btn-join-committee" onclick="openCommitteeModal('org')" id="joinOrg">📩 انضم إلى لجنة الإشراف</button>
       </div>
@@ -433,7 +448,7 @@
       <div class="field"><label id="cml2">رقم الطالب</label><input type="text" id="cStudentId" placeholder="2024XXXXX"></div>
       <div class="field"><label id="cml3">الجامعة والتخصص</label><input type="text" id="cUniSpec" placeholder="EMU - هندسة"></div>
       <div class="field"><label id="cml4">رقم الهاتف / واتساب</label><input type="tel" id="cPhone" placeholder="+90 5XX XXX XXXX"></div>
-      <div class="field"><label id="cml5">لماذا تريد الانضمام؟</label><input type="text" id="cReason" placeholder="لدي خبرة في التنظيم وإدارة الفعاليات..." id="cReasonInput"></div>
+      <div class="field"><label id="cml5">لماذا تريد الانضمام؟</label><input type="text" id="cReason" placeholder="أملك خبرة في التنظيم وإدارة الفعاليات والإشراف..." id="cReasonInput"></div>
     </div>
     <button class="btn-primary" onclick="submitCommitteeJoin()" id="cSubmitBtn">إرسال الطلب</button>
     <div class="success-msg" id="cSuccessMsg">✓ تم إرسال طلبك! سيتواصل معك رئيس اللجنة قريباً</div>

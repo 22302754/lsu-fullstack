@@ -239,20 +239,19 @@ function show2FA() {
 let otpAutoVerifyTimer = null;
 
 function otpMove(el, idx) {
-  // Keep only single digit
-  const val = el.value.replace(/[^0-9]/g,'');
-  el.value = val ? val[val.length-1] : '';
-
-  if (el.value && idx < 5) {
-    document.querySelectorAll('.otp-input')[idx + 1]?.focus();
-  }
-
-  // Auto-verify when all 6 filled
+  // Allow only digits
+  el.value = el.value.replace(/[^0-9]/g,'').slice(0,1);
   const inputs = document.querySelectorAll('.otp-input');
+  // Move to next
+  if (el.value && idx < 5) {
+    inputs[idx + 1].focus();
+    inputs[idx + 1].select();
+  }
+  // Auto verify
   const code = Array.from(inputs).map(i => i.value).join('');
-  if (code.length === 6 && /^[0-9]{6}$/.test(code)) {
+  if (code.length === 6) {
     clearTimeout(otpAutoVerifyTimer);
-    otpAutoVerifyTimer = setTimeout(() => verifyOTP(), 400);
+    otpAutoVerifyTimer = setTimeout(() => verifyOTP(), 300);
   }
 }
 
@@ -267,9 +266,11 @@ function otpKey(e, idx) {
       inputs[idx - 1].focus();
     }
   } else if (e.key === 'ArrowLeft' && idx > 0) {
-    inputs[idx - 1]?.focus();
+    e.preventDefault();
+    inputs[idx - 1].focus();
   } else if (e.key === 'ArrowRight' && idx < 5) {
-    inputs[idx + 1]?.focus();
+    e.preventDefault();
+    inputs[idx + 1].focus();
   } else if (e.key === 'Enter') {
     e.preventDefault();
     verifyOTP();
@@ -280,13 +281,11 @@ function otpPaste(e) {
   e.preventDefault();
   const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g,'').slice(0,6);
   const inputs = document.querySelectorAll('.otp-input');
-  paste.split('').forEach((char, i) => {
-    if (inputs[i]) inputs[i].value = char;
-  });
-  if (paste.length > 0) inputs[Math.min(paste.length, 5)]?.focus();
+  paste.split('').forEach((char, i) => { if (inputs[i]) inputs[i].value = char; });
+  if (paste.length > 0) inputs[Math.min(paste.length-1, 5)].focus();
   if (paste.length === 6) {
     clearTimeout(otpAutoVerifyTimer);
-    otpAutoVerifyTimer = setTimeout(() => verifyOTP(), 400);
+    otpAutoVerifyTimer = setTimeout(() => verifyOTP(), 300);
   }
 }
 
@@ -396,10 +395,17 @@ async function submitCommitteeJoin() {
       body: JSON.stringify(body)
     });
     const data = await res.json();
-    const msg  = document.getElementById('cSuccessMsg');
+    const msg = document.getElementById('cSuccessMsg');
     msg.style.display = 'block';
-    msg.textContent = data.message;
-    if (data.success) setTimeout(() => closeCommitteeModal(), 2800);
+    if (data.success && data.membershipId) {
+      msg.innerHTML = `✓ تم إرسال طلبك بنجاح!<br>
+        <span style="font-size:1.1rem;font-weight:700;letter-spacing:2px;color:#2da644">${data.membershipId}</span><br>
+        <small style="opacity:.8">احتفظ برقم عضويتك</small>`;
+      setTimeout(() => closeCommitteeModal(), 4000);
+    } else {
+      msg.textContent = data.message;
+      if (data.success) setTimeout(() => closeCommitteeModal(), 2800);
+    }
   } catch (err) {
     alert(isArabic ? 'خطأ في الإرسال' : 'Send error');
   }
