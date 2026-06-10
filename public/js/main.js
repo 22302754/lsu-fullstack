@@ -360,10 +360,24 @@ function openCommitteeModal(type) {
   currentCommittee = type;
   const icon = document.getElementById('cModalIcon');
   const sub  = document.getElementById('cModalSub');
-  icon.textContent = type === 'media' ? '📸' : '📋';
-  sub.textContent  = type === 'media'
-    ? (isArabic ? 'لجنة الإعلام والتصوير' : 'Media & Photography Committee')
-    : (isArabic ? 'لجنة الإشراف والتنظيم' : 'Supervision & Organization Committee');
+  const reasonInput = document.getElementById('cReason');
+  const reasonLabel = document.getElementById('cml5');
+
+  if (type === 'media') {
+    icon.textContent = '📸';
+    sub.textContent  = isArabic ? 'لجنة الإعلام والتصوير' : 'Media & Photography Committee';
+    if (reasonInput) reasonInput.placeholder = isArabic
+      ? 'أملك خبرة في التصوير والمونتاج والإعلام الرقمي...'
+      : 'I have experience in photography, video editing and digital media...';
+    if (reasonLabel) reasonLabel.textContent = isArabic ? 'ما هي خبرتك في الإعلام والتصوير؟' : 'What is your media/photography experience?';
+  } else {
+    icon.textContent = '📋';
+    sub.textContent  = isArabic ? 'لجنة الإشراف والتنظيم' : 'Supervision & Organization Committee';
+    if (reasonInput) reasonInput.placeholder = isArabic
+      ? 'أملك خبرة في تنظيم الفعاليات والإشراف والتنسيق...'
+      : 'I have experience in event organization, supervision and coordination...';
+    if (reasonLabel) reasonLabel.textContent = isArabic ? 'ما هي خبرتك في التنظيم والإشراف؟' : 'What is your organization/supervision experience?';
+  }
   document.getElementById('cSuccessMsg').style.display = 'none';
   document.getElementById('committeeModal').classList.add('open');
 }
@@ -637,40 +651,46 @@ window.addEventListener('scroll', () => {
 
 // ===== UPDATE SIDEBAR AFTER LOGIN =====
 function updateSidebarUser(name, membershipId) {
-  // Change "Sign In" button to user name
   const loginBtn = document.getElementById('sidebarLogin');
-  if (loginBtn) {
-    loginBtn.textContent = name || 'مستخدم';
-  }
-  // Change icon
+  if (loginBtn) loginBtn.textContent = name || 'مستخدم';
+
   const loginIcon = loginBtn?.closest('.sidebar-link')?.querySelector('.sidebar-link-icon');
   if (loginIcon) loginIcon.textContent = '👤';
 
-  // Add membership badge if exists
-  if (membershipId) {
-    const badge = document.createElement('small');
-    badge.style.cssText = 'display:block;font-size:.65rem;color:var(--green-light);letter-spacing:.5px;margin-top:2px;';
-    badge.textContent = membershipId;
-    const loginBtnEl = document.getElementById('sidebarLogin');
-    if (loginBtnEl && !loginBtnEl.nextSibling?.tagName === 'SMALL') {
-      loginBtnEl.after(badge);
-    }
-  }
+  // Show membership ID ONLY to the logged-in user in sidebar
+  const loginRow = loginBtn?.closest('.sidebar-link');
+  if (loginRow) {
+    // Remove old badge if exists
+    const oldBadge = document.getElementById('userMemberBadge');
+    if (oldBadge) oldBadge.remove();
 
-  // Add logout button after sign-in
-  const sidebarLogin = document.getElementById('sidebarLogin');
-  const loginRow = sidebarLogin?.closest('.sidebar-link');
-  if (loginRow && !document.getElementById('logoutBtn')) {
-    const logoutBtn = document.createElement('button');
-    logoutBtn.id = 'logoutBtn';
-    logoutBtn.className = 'sidebar-link logout-btn';
-    logoutBtn.innerHTML = `<span class="sidebar-link-icon">🚪</span><span>${isArabic ? 'تسجيل الخروج' : 'Sign Out'}</span>`;
-    logoutBtn.onclick = () => {
-      localStorage.removeItem('lsu_token');
-      localStorage.removeItem('lsu_user');
-      location.reload();
-    };
-    loginRow.after(logoutBtn);
+    if (membershipId) {
+      const badge = document.createElement('div');
+      badge.id = 'userMemberBadge';
+      badge.style.cssText = `
+        font-size:.65rem; color:var(--green-light);
+        letter-spacing:1px; padding:2px 10px 6px;
+        font-family:'Cormorant Garamond',serif;
+        opacity:.85;
+      `;
+      badge.textContent = membershipId;
+      loginRow.after(badge);
+    }
+
+    // Add logout button
+    if (!document.getElementById('logoutBtn')) {
+      const logoutBtn = document.createElement('button');
+      logoutBtn.id = 'logoutBtn';
+      logoutBtn.className = 'sidebar-link logout-btn';
+      logoutBtn.innerHTML = `<span class="sidebar-link-icon">🚪</span><span>${isArabic ? 'تسجيل الخروج' : 'Sign Out'}</span>`;
+      logoutBtn.onclick = () => {
+        localStorage.removeItem('lsu_token');
+        localStorage.removeItem('lsu_user');
+        location.reload();
+      };
+      const memberBadge = document.getElementById('userMemberBadge');
+      (memberBadge || loginRow).after(logoutBtn);
+    }
   }
 }
 
