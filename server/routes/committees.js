@@ -47,7 +47,7 @@ router.post('/join', async (req, res) => {
     try {
       const sendEmail = require('../utils/email');
 
-      // Email to committee head
+      // Email to committee head ONLY
       await sendEmail({
         to: head.email,
         subject: `📋 طلب انضمام جديد - ${commName}`,
@@ -66,19 +66,6 @@ router.post('/join', async (req, res) => {
           <br>
           <a href="https://wa.me/${cleanPhone}" style="background:#25D366;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block">
             💬 تواصل مع الطالب (${phone})
-          </a>
-        </div>`
-      });
-
-      // Email to admin
-      await sendEmail({
-        to: process.env.ADMIN_EMAIL,
-        subject: `📋 طلب انضمام - ${commName}`,
-        html: `<div dir="rtl" style="font-family:Arial;padding:20px">
-          <h3>${commName} | رقم العضوية: <span style="color:#1a7a2e">${membershipId}</span></h3>
-          <p><b>الاسم:</b> ${fullName} | <b>الهاتف:</b> ${phone}</p>
-          <a href="https://wa.me/${head.phone}" style="background:#25D366;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">
-            واتساب ${head.name} (+${head.phone})
           </a>
         </div>`
       });
