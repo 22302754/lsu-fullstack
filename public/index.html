@@ -115,12 +115,12 @@
 
       <!-- OTP boxes -->
       <div class="otp-row" style="margin:16px 0 20px;">
-        <input class="otp-input" type="number" min="0" max="9" id="rotp1" oninput="rotpMove(this,0)" onkeydown="rotpKey(event,0)">
-        <input class="otp-input" type="number" min="0" max="9" id="rotp2" oninput="rotpMove(this,1)" onkeydown="rotpKey(event,1)">
-        <input class="otp-input" type="number" min="0" max="9" id="rotp3" oninput="rotpMove(this,2)" onkeydown="rotpKey(event,2)">
-        <input class="otp-input" type="number" min="0" max="9" id="rotp4" oninput="rotpMove(this,3)" onkeydown="rotpKey(event,3)">
-        <input class="otp-input" type="number" min="0" max="9" id="rotp5" oninput="rotpMove(this,4)" onkeydown="rotpKey(event,4)">
-        <input class="otp-input" type="number" min="0" max="9" id="rotp6" oninput="rotpMove(this,5)" onkeydown="rotpKey(event,5)">
+        <input class="otp-input" type="text" inputmode="numeric" maxlength="1" id="rotp1" oninput="rotpMove(this,0)" onkeydown="rotpKey(event,0)">
+        <input class="otp-input" type="text" inputmode="numeric" maxlength="1" id="rotp2" oninput="rotpMove(this,1)" onkeydown="rotpKey(event,1)">
+        <input class="otp-input" type="text" inputmode="numeric" maxlength="1" id="rotp3" oninput="rotpMove(this,2)" onkeydown="rotpKey(event,2)">
+        <input class="otp-input" type="text" inputmode="numeric" maxlength="1" id="rotp4" oninput="rotpMove(this,3)" onkeydown="rotpKey(event,3)">
+        <input class="otp-input" type="text" inputmode="numeric" maxlength="1" id="rotp5" oninput="rotpMove(this,4)" onkeydown="rotpKey(event,4)">
+        <input class="otp-input" type="text" inputmode="numeric" maxlength="1" id="rotp6" oninput="rotpMove(this,5)" onkeydown="rotpKey(event,5)">
       </div>
 
       <div class="form-stack">
@@ -284,6 +284,7 @@
         <a href="#committees" class="sidebar-link" onclick="closeSidebar()"><span class="sidebar-link-icon">📋</span><span id="sidebarCommittees">اللجان التنفيذية</span></a>
         <a href="#goals"      class="sidebar-link" onclick="closeSidebar()"><span class="sidebar-link-icon">🎯</span><span id="sidebarGoals">الأهداف والرسالة</span></a>
         <a href="#contact"    class="sidebar-link" onclick="closeSidebar()"><span class="sidebar-link-icon">✉️</span><span id="sidebarContact">تواصل معنا</span></a>
+        <a href="/graduates" class="sidebar-link" onclick="closeSidebar()"><span class="sidebar-link-icon">🎓</span><span id="sidebarGraduates">استمارة الخريجين</span></a>
         <button class="acc-back-top" onclick="closeAllAcc()">↑ <span class="acc-back-label" id="backTop1">رجوع للأعلى</span></button>
       </div>
     </div>
@@ -491,6 +492,44 @@
 </section>
 
 <!-- ===== CONTACT ===== -->
+
+    <!-- ===== GRADUATES SECTION ===== -->
+    <section id="graduates" style="padding:90px 0;background:linear-gradient(135deg,rgba(26,122,46,0.06) 0%,rgba(15,90,32,0.03) 100%);">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label" id="gradLabel">الخريجون</span>
+          <h2 class="section-title" id="gradTitle">استمارة تسجيل الخريجين</h2>
+          <p class="section-desc" id="gradDesc">هل أتممت دراستك؟ سجّل بياناتك لتكون جزءاً من سجل خريجي الاتحاد</p>
+        </div>
+        <div style="text-align:center;margin-top:36px;">
+          <div style="display:inline-flex;flex-direction:column;align-items:center;gap:20px;">
+            <div style="font-size:64px;line-height:1;">🎓</div>
+            <div style="max-width:520px;text-align:center;">
+              <h3 style="color:var(--green-light);font-size:1.3rem;margin:0 0 10px;font-family:'Amiri',serif;" id="gradCardTitle">فصل الربيع 2025/2026</h3>
+              <p style="color:var(--text2);font-size:.95rem;line-height:1.8;margin:0 0 24px;" id="gradCardDesc">
+                إذا كنت من خريجي هذا الفصل، سجّل بياناتك الأكاديمية وبيانات التواصل في استمارة الخريجين الرسمية للاتحاد
+              </p>
+            </div>
+            <a href="/graduates" style="
+              display:inline-flex;align-items:center;gap:10px;
+              background:linear-gradient(135deg,#1a7a2e,#0f5a20);
+              color:#fff;text-decoration:none;
+              padding:16px 36px;border-radius:14px;
+              font-size:1rem;font-weight:700;
+              box-shadow:0 8px 24px rgba(26,122,46,0.4);
+              transition:all .3s;font-family:'Tajawal',sans-serif;
+            " id="gradBtn"
+              onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 32px rgba(26,122,46,0.5)'"
+              onmouseout="this.style.transform='';this.style.boxShadow='0 8px 24px rgba(26,122,46,0.4)'"
+            >
+              <span style="font-size:1.2rem;">📋</span>
+              <span>تعبئة استمارة التخرج</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
 <section id="contact">
   <div class="container">
     <div class="section-header">

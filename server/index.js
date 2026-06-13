@@ -1,63 +1,56 @@
 require('dotenv').config();
-
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const helmet = require('helmet');
+const express     = require('express');
+const mongoose    = require('mongoose');
+const cors        = require('cors');
+const helmet      = require('helmet');
+const morgan      = require('morgan');
 const compression = require('compression');
-const path = require('path');
+const rateLimit   = require('express-rate-limit');
+const path        = require('path');
 
 const app = express();
 
-app.set('trust proxy', 1);
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(helmet({
-  contentSecurityPolicy: false
-}));
+// ── Security ──
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors({ origin: true, credentials: true })); // Allow all origins
 app.use(compression());
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
-// API ROUTES FIRST
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/members', require('./routes/members'));
-app.use('/api/committees', require('./routes/committees'));
-app.use('/api/admin', require('./routes/admin'));
+// ── Rate Limiting ──
+app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
+app.use('/api/auth/', rateLimit({ windowMs: 15 * 60 * 1000, max: 15 }));
 
-// STATIC FILES
+// ── Body Parser ──
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// ── Static Files ──
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/admin', express.static(path.join(__dirname, '../admin')));
 
-// FRONTEND ROUTES ONLY
-app.get('/admin*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../admin/index.html'));
-});
+// ── API Routes ──
+app.use('/api/auth',       require('./routes/auth'));
+app.use('/api/members',    require('./routes/members'));
+app.use('/api/committees', require('./routes/committees'));
+app.use('/api/graduates',  require('./routes/graduates'));
+app.use('/api/admin',      require('./routes/admin'));
 
-app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
-});
+// ── Serve Frontend ──
+app.get('/admin*', (req, res) => res.sendFile(path.join(__dirname, '../admin/index.html')));
+app.get('*',       (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
 
-// ERROR HANDLER
+// ── Error Handler ──
 app.use((err, req, res, next) => {
-  console.error(err);
-
-  res.status(500).json({
-    success: false,
-    message: err.message || 'Server Error'
-  });
+  console.error(err.stack);
+  res.status(err.status || 500).json({ success: false, message: err.message || 'Server Error' });
 });
 
-// DATABASE
+// ── Connect DB & Start ──
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('✅ MongoDB Connected');
-
-    app.listen(process.env.PORT || 5000, () => {
-      console.log(`🚀 Server running`);
-    });
+    app.listen(process.env.PORT || 5000, () =>
+      console.log(`🚀 Server: http://localhost:${process.env.PORT || 5000}`)
+    );
   })
-  .catch(err => {
-    console.error('❌ MongoDB Error:', err);
-  });
+  .catch(err => { console.error('❌ DB Error:', err.message); process.exit(1); });
