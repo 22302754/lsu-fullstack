@@ -236,16 +236,18 @@ function show2FA() {
   document.querySelectorAll('.otp-input')[0]?.focus();
 }
 
-
-// ===== OTP INPUTS - COMPLETE FIX =====
 let otpAutoVerifyTimer = null;
 
 function otpMove(el, idx) {
+  // Allow only digits
   el.value = el.value.replace(/[^0-9]/g,'').slice(0,1);
-  const inputs = document.querySelectorAll('#twoFAModal .otp-input');
+  const inputs = document.querySelectorAll('.otp-input');
+  // Move to next
   if (el.value && idx < 5) {
     inputs[idx + 1].focus();
+    inputs[idx + 1].select();
   }
+  // Auto verify
   const code = Array.from(inputs).map(i => i.value).join('');
   if (code.length === 6) {
     clearTimeout(otpAutoVerifyTimer);
@@ -254,7 +256,7 @@ function otpMove(el, idx) {
 }
 
 function otpKey(e, idx) {
-  const inputs = document.querySelectorAll('#twoFAModal .otp-input');
+  const inputs = document.querySelectorAll('.otp-input');
   if (e.key === 'Backspace') {
     e.preventDefault();
     if (inputs[idx].value) {
@@ -264,18 +266,21 @@ function otpKey(e, idx) {
       inputs[idx - 1].focus();
     }
   } else if (e.key === 'ArrowLeft' && idx > 0) {
-    e.preventDefault(); inputs[idx - 1].focus();
+    e.preventDefault();
+    inputs[idx - 1].focus();
   } else if (e.key === 'ArrowRight' && idx < 5) {
-    e.preventDefault(); inputs[idx + 1].focus();
+    e.preventDefault();
+    inputs[idx + 1].focus();
   } else if (e.key === 'Enter') {
-    e.preventDefault(); verifyOTP();
+    e.preventDefault();
+    verifyOTP();
   }
 }
 
 function otpPaste(e) {
   e.preventDefault();
   const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g,'').slice(0,6);
-  const inputs = document.querySelectorAll('#twoFAModal .otp-input');
+  const inputs = document.querySelectorAll('.otp-input');
   paste.split('').forEach((char, i) => { if (inputs[i]) inputs[i].value = char; });
   if (paste.length > 0) inputs[Math.min(paste.length-1, 5)].focus();
   if (paste.length === 6) {
@@ -284,29 +289,331 @@ function otpPaste(e) {
   }
 }
 
-// Reset password OTP
-function rotpMove(el, idx) {
-  el.value = el.value.replace(/[^0-9]/g,'').slice(0,1);
-  const inputs = document.querySelectorAll('#panelReset .otp-input');
-  if (el.value && idx < 5) {
-    inputs[idx + 1].focus();
+async function verifyOTP() {
+  const otp = Array.from(document.querySelectorAll('.otp-input')).map(i => i.value).join('');
+  if (otp.length < 6) { alert(isArabic ? 'أدخل الرمز كاملاً (6 أرقام)' : 'Enter all 6 digits'); return; }
+
+  const btn = document.getElementById('tfaVerifyBtn');
+  btn.disabled = true;
+  btn.textContent = isArabic ? 'جارٍ التحقق...' : 'Verifying...';
+
+  try {
+    const res  = await fetch(`${API_URL}/api/auth/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: pendingUserId, otp })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem('lsu_token', data.token);
+      localStorage.setItem('lsu_user', JSON.stringify(data.user));
+      // Clear inputs and show success
+      document.querySelectorAll('.otp-input').forEach(i => { i.value=''; i.style.borderColor=''; });
+      document.getElementById('tfaSuccess').style.display = 'block';
+      const userName = data.user?.name || data.user?.firstName || '';
+      updateSidebarUser(userName, data.user?.membershipId || '');
+      setTimeout(() => enterSite(userName), 1500);
+    } else {
+      // Show error on inputs - shake effect, don't alert
+      document.querySelectorAll('.otp-input').forEach(i => {
+        i.style.borderColor = '#dc3545';
+        i.value = '';
+      });
+      document.querySelectorAll('.otp-input')[0]?.focus();
+      // Show inline error instead of alert
+      const sub = document.getElementById('tfaSub');
+      if (sub) {
+        sub.textContent = isArabic ? '❌ الرمز غير صحيح، حاول مجدداً' : '❌ Wrong code, try again';
+        sub.style.color = '#dc3545';
+        setTimeout(() => {
+          sub.textContent = isArabic ? 'أدخل الرمز المُرسل إلى بريدك الإلكتروني' : 'Enter the code sent to your email';
+          sub.style.color = '';
+        }, 3000);
+      }
+    }
+  } catch (err) {
+    alert(isArabic ? 'خطأ في التحقق' : 'Verification error');
+  }
+
+  btn.disabled = false;
+  btn.textContent = isArabic ? 'تحقق والدخول' : 'Verify & Enter';
+}
+
+async function resendOTP() {
+  if (!pendingUserId) return;
+  try {
+    await fetch(`${API_URL}/api/auth/resend-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: pendingUserId })
+    });
+    alert(isArabic ? 'تم إعادة إرسال الرمز' : 'Code resent!');
+  } catch (err) {
+    alert(isArabic ? 'خطأ في الإرسال' : 'Send error');
   }
 }
 
-function rotpKey(e, idx) {
-  const inputs = document.querySelectorAll('#panelReset .otp-input');
-  if (e.key === 'Backspace') {
-    e.preventDefault();
-    if (inputs[idx].value) {
-      inputs[idx].value = '';
-    } else if (idx > 0) {
-      inputs[idx - 1].value = '';
-      inputs[idx - 1].focus();
-    }
-  } else if (e.key === 'Enter') {
-    e.preventDefault(); doResetPassword();
+// ===== COMMITTEE MODAL (connects to backend) =====
+let currentCommittee = '';
+function openCommitteeModal(type) {
+  currentCommittee = type;
+  const icon = document.getElementById('cModalIcon');
+  const sub  = document.getElementById('cModalSub');
+  const reasonInput = document.getElementById('cReason');
+  const reasonLabel = document.getElementById('cml5');
+
+  if (type === 'media') {
+    icon.textContent = '📸';
+    sub.textContent  = isArabic ? 'لجنة الإعلام والتصوير' : 'Media & Photography Committee';
+    if (reasonInput) reasonInput.placeholder = isArabic
+      ? 'أملك خبرة في التصوير والمونتاج والإعلام الرقمي...'
+      : 'I have experience in photography, video editing and digital media...';
+    if (reasonLabel) reasonLabel.textContent = isArabic ? 'ما هي خبرتك في الإعلام والتصوير؟' : 'What is your media/photography experience?';
+  } else {
+    icon.textContent = '📋';
+    sub.textContent  = isArabic ? 'لجنة الإشراف والتنظيم' : 'Supervision & Organization Committee';
+    if (reasonInput) reasonInput.placeholder = isArabic
+      ? 'أملك خبرة في تنظيم الفعاليات والإشراف والتنسيق...'
+      : 'I have experience in event organization, supervision and coordination...';
+    if (reasonLabel) reasonLabel.textContent = isArabic ? 'ما هي خبرتك في التنظيم والإشراف؟' : 'What is your organization/supervision experience?';
   }
+  document.getElementById('cSuccessMsg').style.display = 'none';
+  document.getElementById('committeeModal').classList.add('open');
 }
+function closeCommitteeModal() {
+  document.getElementById('committeeModal').classList.remove('open');
+}
+document.getElementById('committeeModal').addEventListener('click', function(e) {
+  if (e.target === this) closeCommitteeModal();
+});
+
+async function submitCommitteeJoin() {
+  const btn = document.getElementById('cSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = isArabic ? 'جارٍ الإرسال...' : 'Sending...';
+
+  const body = {
+    fullName:  document.getElementById('cFullName').value,
+    studentId: document.getElementById('cStudentId').value,
+    uniMajor:  document.getElementById('cUniSpec').value,
+    phone:     document.getElementById('cPhone').value,
+    reason:    document.getElementById('cReason').value,
+    committee: currentCommittee,
+  };
+
+  try {
+    const res  = await fetch(`${API_URL}/api/committees/join`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    const msg = document.getElementById('cSuccessMsg');
+    msg.style.display = 'block';
+    if (data.success && data.membershipId) {
+      msg.innerHTML = `✓ تم إرسال طلبك بنجاح!<br>
+        <span style="font-size:1.1rem;font-weight:700;letter-spacing:2px;color:#2da644">${data.membershipId}</span><br>
+        <small style="opacity:.8">احتفظ برقم عضويتك</small>`;
+      setTimeout(() => closeCommitteeModal(), 4000);
+    } else {
+      msg.textContent = data.message;
+      if (data.success) setTimeout(() => closeCommitteeModal(), 2800);
+    }
+  } catch (err) {
+    alert(isArabic ? 'خطأ في الإرسال' : 'Send error');
+  }
+
+  btn.disabled = false;
+  btn.textContent = isArabic ? 'إرسال الطلب' : 'Send Request';
+}
+
+// ===== LANGUAGE TOGGLE =====
+let isArabic = true;
+const T = {
+  ar: {
+    langBtn:'EN', mTitle:'اتحاد الطلبة الليبيين', mSub:'قبرص التركية · Turkish Cyprus',
+    btnLogin:'تسجيل الدخول', btnReg:'عضوية جديدة',
+    lEmail:'البريد الإلكتروني / رقم الطالب', lPass:'كلمة المرور',
+    lFirst:'الاسم الأول', lLast:'اللقب', lDOB:'تاريخ الميلاد', lNat:'الجنسية',
+    lUni:'الجامعة', lSpec:'التخصص', lYear:'السنة الدراسية', lStudID:'رقم الطالب',
+    lPhone:'رقم الهاتف', lEmailReg:'البريد الإلكتروني', lPassReg:'كلمة المرور', lPassConf:'تأكيد كلمة المرور',
+    btnLoginSubmit:'دخول', btnRegSubmit:'إنشاء العضوية', guestTxt:'أو ', guestLink:'تصفح كزائر',
+    tfaTitle:'التحقق من الهوية', tfaSub:'أدخل الرمز المُرسل إلى بريدك الإلكتروني',
+    tfaVerifyBtn:'تحقق والدخول', tfaSuccess:'✓ تم التحقق! مرحباً بك 🎉',
+    navTitle:'اتحاد الطلبة الليبيين', navSub:'قبرص التركية',
+    sidebarLogoText:'اتحاد الطلبة الليبيين', sidebarLogoSub:'قبرص التركية',
+    sidebarSec1:'التنقل', sidebarHome:'الرئيسية', sidebarAbout:'عن الاتحاد',
+    sidebarLeader:'قيادة الاتحاد', sidebarCommittees:'اللجان التنفيذية',
+    sidebarGoals:'الأهداف والرسالة', sidebarContact:'تواصل معنا',
+    sidebarSec2:'الانضمام', sidebarJoin:'إنشاء عضوية', sidebarLogin:'تسجيل الدخول',
+    sidebarMediaJoin:'انضم للجنة الإعلام', sidebarOrgJoin:'انضم للجنة الإشراف',
+    sidebarSec3:'الإعدادات', sidebarThemeText:'الوضع الليلي', sidebarLang:'English', sidebarTopText:'للأعلى', backTop1:'رجوع للأعلى', backTop2:'رجوع للأعلى', backTop3:'رجوع للأعلى',
+    heroEyebrow:'منذ التأسيس · Since 2026',
+    heroTitle:'اتحاد الطلبة الليبيين\nفي قبرص التركية',
+    heroTitleEn:'Libyan Students Union · Turkish Cyprus',
+    heroDesc:'منظمة طلابية تجمع أبناء ليبيا الدارسين في قبرص التركية، تسعى إلى خدمة الطالب الليبي وتمثيله وتعزيز التواصل بين أفراد الجالية الطلابية',
+    heroCta:'انضم إلى الاتحاد', heroLearn:'اعرف أكثر ↓',
+    aboutLabel:'نبذة تعريفية', aboutTitle:'من نحن؟',
+    aboutP1:'اتحاد الطلبة الليبيين في قبرص التركية هو منظمة طلابية مستقلة تأسست عام <strong class="highlight">2026</strong>، تُعنى بشؤون الطلاب الليبيين المقيمين والدارسين في مختلف الجامعات بقبرص التركية.',
+    aboutP2:'يعمل الاتحاد على تعزيز التواصل بين أفراد الجالية الطلابية الليبية، وتنظيم الفعاليات الثقافية والاجتماعية والرياضية، والتنسيق مع الجهات الليبية والقبرصية.',
+    aboutP3:'يؤمن الاتحاد بأن الطالب الليبي المتعلم في الخارج هو سفير لوطنه ولبنة أساسية في مسيرة التنمية الوطنية.',
+    statStudents:'طالب مسجل', statUnis:'جامعة شريكة', statYears:'سنة التأسيس', statEvents:'طموح لا حدود له',
+    leaderLabel:'الهيكل القيادي', leaderTitle:'قيادة الاتحاد',
+    leaderDesc:'يقود الاتحاد نخبة من الطلبة الليبيين المتميزين الملتزمين بخدمة زملائهم',
+    presidentBadge:'رئيس الاتحاد', viceBadge:'نائب الرئيس', boardLabel:'مجلس الإدارة',
+    r1:'عضو مجلس الإدارة', r2:'عضو مجلس الإدارة', r3:'عضو مجلس الإدارة',
+    r4:'عضو مجلس الإدارة', r5:'عضو مجلس الإدارة', r6:'عضو مجلس الإدارة',
+    committeesLabel:'لجان الاتحاد', committeesTitle:'اللجان التنفيذية',
+    comm1Name:'لجنة الإعلام والتصوير', comm1HeadLabel:'رئيس اللجنة',
+    comm1Desc:'تتولى توثيق فعاليات الاتحاد وتغطيتها إعلامياً، وإدارة حسابات التواصل الاجتماعي، وإنتاج المحتوى المرئي والمصور.',
+    joinMedia:'📩 انضم إلى لجنة الإعلام',
+    comm2Name:'لجنة الإشراف والتنظيم', comm2HeadLabel:'رئيس اللجنة',
+    comm2Desc:'تختص بالإشراف على الفعاليات والأنشطة لوجستياً، وضمان سير الأعمال وفق الخطط المرسومة.',
+    joinOrg:'📩 انضم إلى لجنة الإشراف',
+    cml1:'الاسم الكامل', cml2:'رقم الطالب', cml3:'الجامعة والتخصص', cml4:'رقم الهاتف / واتساب', cml5:'لماذا تريد الانضمام؟',
+    cModalTitle:'طلب الانضمام', cSubmitBtn:'إرسال الطلب', cSuccessMsg:'✓ تم إرسال طلبك!',
+    goalsLabel:'رسالتنا وأهدافنا', goalsTitle:'ماذا نفعل؟',
+    g1t:'الدعم الأكاديمي', g1p:'مساعدة الطلبة في شؤونهم الجامعية من تسجيل ومعادلة وحل مشكلات مع إدارات الجامعات',
+    g2t:'التواصل والتلاحم', g2p:'بناء شبكة اجتماعية قوية تجمع الطلبة الليبيين وتعزز الروابط بينهم بعيداً عن الغربة',
+    g3t:'الخدمات الإدارية', g3p:'التنسيق مع الجهات الحكومية الليبية والقبرصية لإنجاز المعاملات الرسمية',
+    g4t:'الأنشطة الثقافية', g4p:'تنظيم البطولات الرياضية والفعاليات الثقافية التي تُبرز الهوية الليبية',
+    g5t:'التطوير والتدريب', g5p:'إقامة ورش العمل والدورات التدريبية لتطوير مهارات الطلبة',
+    g6t:'التمثيل والمناصرة', g6p:'تمثيل مصالح الطلبة الليبيين أمام الجهات الرسمية والدولية',
+    contactLabel:'تواصل معنا', contactTitle:'نحن هنا من أجلك',
+    contactDesc:'لا تتردد في التواصل معنا لأي استفسار أو طلب مساعدة',
+    cEmail:'البريد الإلكتروني', cWhatsapp:'واتساب', cSocial:'إنستقرام', cLocation:'الموقع',
+    fAbout:'عن الاتحاد', fLeader:'القيادة', fComm:'اللجان', fContact:'تواصل',
+    footerText:'© 2026 اتحاد الطلبة الليبيين في قبرص التركية · جميع الحقوق محفوظة', forgotLink:'نسيت كلمة المرور؟', backBtnText:'رجوع', tfaBackText:'رجوع', forgotDesc:'أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور', lForgotEmail:'البريد الإلكتروني', btnForgotSubmit:'إرسال رابط الإعادة'
+  },
+  en: {
+    langBtn:'AR', mTitle:'Libyan Students Union', mSub:'Turkish Cyprus · قبرص التركية',
+    btnLogin:'Sign In', btnReg:'New Membership',
+    lEmail:'Email / Student ID', lPass:'Password',
+    lFirst:'First Name', lLast:'Last Name', lDOB:'Date of Birth', lNat:'Nationality',
+    lUni:'University', lSpec:'Major', lYear:'Academic Year', lStudID:'Student ID',
+    lPhone:'Phone Number', lEmailReg:'Email Address', lPassReg:'Password', lPassConf:'Confirm Password',
+    btnLoginSubmit:'Sign In', btnRegSubmit:'Create Membership', guestTxt:'or ', guestLink:'Browse as Guest',
+    tfaTitle:'Identity Verification', tfaSub:'Enter the code sent to your email',
+    tfaVerifyBtn:'Verify & Enter', tfaSuccess:'✓ Verified! Welcome 🎉',
+    navTitle:'Libyan Students Union', navSub:'Turkish Cyprus',
+    sidebarLogoText:'Libyan Students Union', sidebarLogoSub:'Turkish Cyprus',
+    sidebarSec1:'Navigation', sidebarHome:'Home', sidebarAbout:'About the Union',
+    sidebarLeader:'Union Leadership', sidebarCommittees:'Committees',
+    sidebarGoals:'Goals & Mission', sidebarContact:'Contact Us',
+    sidebarSec2:'Join', sidebarJoin:'Create Membership', sidebarLogin:'Sign In',
+    sidebarMediaJoin:'Join Media Committee', sidebarOrgJoin:'Join Organization Committee',
+    sidebarSec3:'Settings', sidebarThemeText:'Dark Mode', sidebarLang:'عربي', sidebarTopText:'To Top', backTop1:'Back to Top', backTop2:'Back to Top', backTop3:'Back to Top',
+    heroEyebrow:'Since Foundation · 2026',
+    heroTitle:'Libyan Students Union\nin Turkish Cyprus',
+    heroTitleEn:'اتحاد الطلبة الليبيين · قبرص التركية',
+    heroDesc:'A student organization uniting Libyan students in Turkish Cyprus, dedicated to serving, representing and connecting the Libyan student community.',
+    heroCta:'Join the Union', heroLearn:'Learn More ↓',
+    aboutLabel:'About Us', aboutTitle:'Who Are We?',
+    aboutP1:'The Libyan Students Union in Turkish Cyprus is an independent student organization founded in <strong class="highlight">2026</strong>, dedicated to the affairs of Libyan students studying at universities across Turkish Cyprus.',
+    aboutP2:'The Union works to strengthen communication within the Libyan student community, organize cultural, social and sports events.',
+    aboutP3:'The Union believes that a Libyan student educated abroad is an ambassador for their homeland and a cornerstone of national development.',
+    statStudents:'Registered Students', statUnis:'Partner Universities', statYears:'Founded', statEvents:'Unlimited Ambition',
+    leaderLabel:'Leadership Structure', leaderTitle:'Union Leadership',
+    leaderDesc:'The Union is led by distinguished Libyan students committed to serving their peers.',
+    presidentBadge:'Union President', viceBadge:'Vice President', boardLabel:'Board of Directors',
+    r1:'Board Member', r2:'Board Member', r3:'Board Member', r4:'Board Member', r5:'Board Member', r6:'Board Member',
+    committeesLabel:'Union Committees', committeesTitle:'Executive Committees',
+    comm1Name:'Media & Photography Committee', comm1HeadLabel:'Committee Head',
+    comm1Desc:'Handles documenting Union events, managing social media accounts, and producing visual content.',
+    joinMedia:'📩 Join Media Committee',
+    comm2Name:'Supervision & Organization Committee', comm2HeadLabel:'Committee Head',
+    comm2Desc:'Oversees events and activities logistically, ensures operations run according to plan.',
+    joinOrg:'📩 Join Organization Committee',
+    cml1:'Full Name', cml2:'Student ID', cml3:'University & Major', cml4:'Phone / WhatsApp', cml5:'Why do you want to join?',
+    cModalTitle:'Join Request', cSubmitBtn:'Send Request', cSuccessMsg:'✓ Request sent successfully!',
+    goalsLabel:'Our Mission & Goals', goalsTitle:'What We Do',
+    g1t:'Academic Support', g1p:'Helping students with registration, credit transfers, and resolving academic issues.',
+    g2t:'Community & Connection', g2p:'Building a strong social network connecting Libyan students.',
+    g3t:'Administrative Services', g3p:'Coordinating with Libyan and Cypriot authorities for official transactions.',
+    g4t:'Cultural Events', g4p:'Organizing sports tournaments and cultural events that showcase Libyan identity.',
+    g5t:'Development & Training', g5p:'Hosting workshops and training courses to develop student skills.',
+    g6t:'Representation & Advocacy', g6p:'Representing Libyan student interests before official and international bodies.',
+    contactLabel:'Contact Us', contactTitle:'We Are Here For You',
+    contactDesc:'Do not hesitate to reach out for any inquiry or assistance.',
+    cEmail:'Email', cWhatsapp:'WhatsApp', cSocial:'Instagram', cLocation:'Location',
+    fAbout:'About', fLeader:'Leadership', fComm:'Committees', fContact:'Contact',
+    footerText:'© 2026 Libyan Students Union in Turkish Cyprus · All Rights Reserved', forgotLink:'Forgot Password?', backBtnText:'Back', tfaBackText:'Back', forgotDesc:'Enter your email and we will send you a password reset link', lForgotEmail:'Email Address', btnForgotSubmit:'Send Reset Link'
+  }
+};
+
+function toggleLang() {
+  isArabic = !isArabic;
+  const lang = isArabic ? 'ar' : 'en';
+  const t = T[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = isArabic ? 'rtl' : 'ltr';
+  document.body.classList.toggle('ltr', !isArabic);
+  Object.keys(t).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (['heroTitle','aboutP1','aboutP2','aboutP3'].includes(id)) el.innerHTML = t[id].replace('\n','<br>');
+    else el.textContent = t[id];
+  });
+  const styleEl = document.getElementById('dynLangStyle') || (() => {
+    const s = document.createElement('style'); s.id = 'dynLangStyle'; document.head.appendChild(s); return s;
+  })();
+  styleEl.textContent = isArabic
+    ? `.sidebar{right:-310px;left:auto}.sidebar.open{right:0;left:auto}.sidebar-link{text-align:right}.sidebar-link::before{right:0;left:auto}`
+    : `.sidebar{left:-310px;right:auto}.sidebar.open{left:0;right:auto}.sidebar-link{text-align:left}.sidebar-link::before{left:0;right:auto}`;
+
+  // Update modal lang button
+  const modalLangBtn = document.getElementById('modalLangBtn');
+  if (modalLangBtn) modalLangBtn.textContent = isArabic ? 'EN / عربي' : 'عربي / EN';
+
+  // Update modal theme button
+  const modalThemeBtn = document.getElementById('modalThemeBtn');
+  if (modalThemeBtn) modalThemeBtn.textContent = isDark ? '🌙' : '☀️';
+}
+
+// ===== INTERSECTION OBSERVER =====
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.goal-card,.board-card,.leader-card,.stat-card,.committee-card,.contact-card').forEach(el => {
+  el.classList.add('fade-in'); obs.observe(el);
+});
+
+
+
+// ===== WELCOME BANNER =====
+function showWelcome(name) {
+  // Remove existing banner
+  const old = document.getElementById('welcomeBanner');
+  if (old) old.remove();
+
+  const banner = document.createElement('div');
+  banner.id = 'welcomeBanner';
+  const greeting = isArabic ? `مرحباً، ${name} 👋` : `Welcome, ${name} 👋`;
+  banner.innerHTML = `<span>${greeting}</span><button onclick="this.parentElement.remove()">✕</button>`;
+  banner.style.cssText = `
+    position:fixed; top:76px; left:50%; transform:translateX(-50%);
+    background:linear-gradient(135deg,#1a7a2e,#2da644);
+    color:#fff; padding:12px 28px; border-radius:30px; z-index:9998;
+    font-family:'Tajawal',sans-serif; font-size:1rem; font-weight:700;
+    display:flex; align-items:center; gap:14px;
+    box-shadow:0 8px 30px rgba(26,122,46,0.45);
+    animation:slideDown .4s cubic-bezier(.22,1,.36,1);
+  `;
+  banner.querySelector('button').style.cssText = 
+    'background:rgba(255,255,255,.2);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:.9rem;';
+  document.body.appendChild(banner);
+  setTimeout(() => { if(banner.parentElement) banner.remove(); }, 5000);
+}
+
+
+
+// ===== SIDEBAR SCROLL TO TOP =====
+function sidebarScrollTop() {
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) sidebar.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 
 // ===== PASSWORD VISIBILITY TOGGLE =====
 function togglePass(inputId, btn) {
@@ -478,6 +785,15 @@ function rotpMove(el, idx) {
     document.querySelectorAll('#panelReset .otp-input')[idx + 1]?.focus();
   }
 }
+function rotpKey(e, idx) {
+  const inputs = document.querySelectorAll('#panelReset .otp-input');
+  if (e.key === 'Backspace') {
+    inputs[idx].value = '';
+    if (idx > 0) inputs[idx-1]?.focus();
+    e.preventDefault();
+  }
+}
+
 async function doResetPassword() {
   const inputs = document.querySelectorAll('#panelReset .otp-input');
   const otp = Array.from(inputs).map(i => i.value).join('');
