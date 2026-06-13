@@ -30,12 +30,13 @@ router.post('/register', [
 
     const user = await User.create({ firstName, lastName, email, password, studentId, university, major, year, phone, dob, nationality });
 
-    const otp = user.generateOTP();
-    await user.save();
+    // Generate OTP and save directly without triggering pre-save hook
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    await User.updateOne({ _id: user._id }, { $set: { otp: { code: otpCode, expiresAt } } });
 
-    // Show OTP in terminal (for testing when email not configured)
     console.log('\n🔐 ============================');
-    console.log(`🔐 REGISTER OTP for ${email}: ${otp}`);
+    console.log(`🔐 REGISTER OTP for ${email}: ${otpCode}`);
     console.log('🔐 ============================\n');
 
     await sendEmail({
@@ -45,7 +46,7 @@ router.post('/register', [
         <h2 style="color:#1a7a2e">اتحاد الطلبة الليبيين في قبرص التركية</h2>
         <p>مرحباً ${firstName}،</p>
         <p>رمز التحقق الخاص بك:</p>
-        <div style="font-size:40px;font-weight:bold;color:#1a7a2e;letter-spacing:10px;text-align:center;padding:24px;background:#f0f9f0;border-radius:12px;margin:20px 0">${otp}</div>
+        <div style="font-size:40px;font-weight:bold;color:#1a7a2e;letter-spacing:10px;text-align:center;padding:24px;background:#f0f9f0;border-radius:12px;margin:20px 0">${otpCode}</div>
         <p style="color:#888">هذا الرمز صالح لمدة 10 دقائق فقط</p>
       </div>`
     });
@@ -153,12 +154,12 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    const otp = user.generateOTP();
-    await user.save();
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    await User.updateOne({ _id: user._id }, { $set: { otp: { code: otpCode, expiresAt } } });
 
-    // Show OTP in terminal (for testing when email not configured)
     console.log('\n🔐 ============================');
-    console.log(`🔐 LOGIN OTP for ${email}: ${otp}`);
+    console.log(`🔐 LOGIN OTP for ${email}: ${otpCode}`);
     console.log('🔐 ============================\n');
 
     await sendEmail({
@@ -167,7 +168,7 @@ router.post('/login', async (req, res) => {
       html: `<div dir="rtl" style="font-family:Arial;max-width:500px;margin:auto;padding:20px">
         <h2 style="color:#1a7a2e">رمز تسجيل الدخول</h2>
         <p>مرحباً ${user.firstName}،</p>
-        <div style="font-size:40px;font-weight:bold;color:#1a7a2e;letter-spacing:10px;text-align:center;padding:24px;background:#f0f9f0;border-radius:12px;margin:20px 0">${otp}</div>
+        <div style="font-size:40px;font-weight:bold;color:#1a7a2e;letter-spacing:10px;text-align:center;padding:24px;background:#f0f9f0;border-radius:12px;margin:20px 0">${otpCode}</div>
         <p style="color:#888">صالح لمدة 10 دقائق</p>
       </div>`
     });
