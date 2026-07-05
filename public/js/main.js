@@ -20,14 +20,15 @@ function toggleTheme() {
   isDark = !isDark;
   document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
   const icon = isDark ? '🌙' : '☀️';
+  // Update all theme buttons
   ['themeBtn','modalThemeBtn'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = icon;
   });
-  const sbIcon = document.getElementById('sbThemeIcon');
-  const sbTxt  = document.getElementById('sbTheme');
-  if (sbIcon) sbIcon.textContent = icon;
-  if (sbTxt)  sbTxt.textContent  = isDark ? (isArabic ? 'الوضع الليلي' : 'Dark Mode') : (isArabic ? 'الوضع النهاري' : 'Light Mode');
+  const sideIcon = document.getElementById('sidebarThemeIcon');
+  const sideText = document.getElementById('sidebarThemeText');
+  if (sideIcon) sideIcon.textContent = icon;
+  if (sideText) sideText.textContent = isDark ? (isArabic ? 'الوضع الليلي' : 'Dark Mode') : (isArabic ? 'الوضع النهاري' : 'Light Mode');
 }
 
 // ===== SCROLL =====
@@ -80,8 +81,14 @@ function openSidebar() {
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarOverlay').classList.remove('open');
-  document.getElementById('hamburgerBtn')?.classList.remove('open');
   document.body.style.overflow = '';
+  const btn = document.getElementById('hamburgerBtn');
+  if (btn) btn.classList.remove('is-open');
+  // Remove solid navbar if not scrolled
+  if (window.scrollY <= 20) {
+    const nav = document.getElementById('mainNav');
+    if (nav) nav.classList.remove('sidebar-open');
+  }
 }
 
 function toggleSidebar() {
@@ -346,16 +353,6 @@ window.addEventListener('scroll', () => {
 
 // ===== UPDATE SIDEBAR AFTER LOGIN =====
 function updateSidebarUser(name, membershipId) {
-  // Show user banner in new sidebar
-  const banner = document.getElementById('sbUserBanner');
-  const sbName = document.getElementById('sbUserName');
-  const sbId   = document.getElementById('sbUserId');
-  const sbAv   = document.getElementById('sbAvatar');
-  if (banner) banner.style.display = 'flex';
-  if (sbName) sbName.textContent = name || 'مستخدم';
-  if (sbId && membershipId) sbId.textContent = membershipId;
-  if (sbAv && name) sbAv.textContent = name[0];
-
   const loginBtn = document.getElementById('sidebarLogin');
   if (loginBtn) loginBtn.textContent = name || 'مستخدم';
 
