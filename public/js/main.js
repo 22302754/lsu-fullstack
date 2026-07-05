@@ -63,7 +63,7 @@ function openSidebar() {
   document.getElementById('sidebarOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   const btn = document.getElementById('hamburgerBtn');
-  if (btn) btn.classList.add('is-open');
+  if (btn) { btn.classList.add('is-open'); btn.classList.add('open'); }
   // Make navbar solid when sidebar opens
   const nav = document.getElementById('mainNav');
   if (nav) nav.classList.add('sidebar-open');
@@ -82,7 +82,7 @@ function closeSidebar() {
   document.getElementById('sidebarOverlay').classList.remove('open');
   document.body.style.overflow = '';
   const btn = document.getElementById('hamburgerBtn');
-  if (btn) btn.classList.remove('is-open');
+  if (btn) { btn.classList.remove('is-open'); btn.classList.remove('open'); }
   if (window.scrollY <= 20) {
     const nav = document.getElementById('mainNav');
     if (nav) nav.classList.remove('sidebar-open');
