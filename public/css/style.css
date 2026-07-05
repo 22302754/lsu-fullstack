@@ -1703,3 +1703,13 @@ section { scroll-margin-top: 64px !important; }
   .nav-center-badge { width: 30px; height: 30px; font-size: 9px; }
   .nav-center-text span { font-size: .78rem; }
 }
+
+/* ===== NAV LOGO IMAGE ===== */
+.nav-center-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}

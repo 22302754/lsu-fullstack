@@ -751,28 +751,97 @@ function sidebarScrollTop() {
 // Apply translations
 function applyTranslations() {
   const ar = {
-    sidebarHome:'الرئيسية', sidebarAbout:'عن الاتحاد', sidebarLeader:'قيادة الاتحاد',
-    sidebarCommittees:'اللجان التنفيذية', sidebarGoals:'الأهداف والرسالة', sidebarContact:'تواصل معنا',
-    sidebarSec1:'التنقل', sidebarSec2:'الانضمام', sidebarSec3:'الإعدادات',
-    sidebarJoin:'إنشاء عضوية', sidebarLogin:'تسجيل الدخول',
-    sidebarMediaJoin:'انضم للجنة الإعلام', sidebarOrgJoin:'انضم للجنة الإشراف',
-    sidebarThemeText:'الوضع الليلي', sidebarLang:'English',
-    sidebarGraduates:'استمارة الخريجين',
-    backTop1:'رجوع للأعلى', backTop2:'رجوع للأعلى', backTop3:'رجوع للأعلى',
+    // Navbar
+    navTitle: 'اتحاد الطلبة الليبيين',
+    navSub: 'قبرص التركية · Turkish Cyprus',
+    navMenuLabel: 'قائمة',
+    langBtn: 'EN',
+    // Sidebar
+    sidebarLogoText: 'اتحاد الطلبة الليبيين',
+    sidebarSec1: 'التنقل', sidebarSec2: 'الانضمام', sidebarSec3: 'الإعدادات',
+    sidebarHome: 'الرئيسية', sidebarAbout: 'عن الاتحاد',
+    sidebarLeader: 'قيادة الاتحاد', sidebarCommittees: 'اللجان التنفيذية',
+    sidebarGoals: 'الأهداف والرسالة', sidebarGraduates: 'استمارة الخريجين',
+    sidebarContact: 'تواصل معنا', sidebarJoin: 'إنشاء عضوية',
+    sidebarLogin: 'تسجيل الدخول', sidebarMediaJoin: 'انضم للجنة الإعلام',
+    sidebarOrgJoin: 'انضم للجنة الإشراف', sidebarLang: 'English',
+    sidebarThemeText: 'الوضع الليلي', sidebarFooter: '© 2026 اتحاد الطلبة الليبيين',
+    backTop1: 'رجوع للأعلى', backTop2: 'رجوع للأعلى', backTop3: 'رجوع للأعلى',
+    // Hero
+    heroEyebrow: 'منذ 2026',
+    heroCta: 'انضم إلى الاتحاد', heroGuest: 'اعرف أكثر',
+    guestTxt: 'أو ', guestLink: 'تصفح كزائر',
+    // Sections
+    aboutLabel: 'نبذة عنّا', aboutTitle: 'من نحن؟',
+    leaderLabel: 'القيادة', leaderTitle: 'قيادة الاتحاد',
+    commLabel: 'اللجان', commTitle: 'اللجان التنفيذية',
+    goalsLabel: 'رسالتنا', goalsTitle: 'أهدافنا ورسالتنا',
+    contactLabel: 'تواصل', contactTitle: 'تواصل معنا',
+    // Auth modal
+    mSub: 'قبرص التركية · Turkish Cyprus',
+    btnLogin: 'تسجيل الدخول', btnReg: 'عضوية جديدة',
+    lEmail: 'البريد الإلكتروني / رقم الطالب',
+    lPass: 'كلمة المرور',
+    btnLoginSubmit: 'دخول',
+    forgotLink: 'نسيت كلمة المرور؟',
+    backBtnText: 'رجوع', tfaBackText: 'رجوع',
+    modalLangBtn: 'EN / عربي',
+    modalThemeBtn: '🌙',
   };
   const en = {
-    sidebarHome:'Home', sidebarAbout:'About', sidebarLeader:'Leadership',
-    sidebarCommittees:'Committees', sidebarGoals:'Goals & Mission', sidebarContact:'Contact Us',
-    sidebarSec1:'Navigation', sidebarSec2:'Join', sidebarSec3:'Settings',
-    sidebarJoin:'Create Membership', sidebarLogin:'Sign In',
-    sidebarMediaJoin:'Join Media Committee', sidebarOrgJoin:'Join Organization Committee',
-    sidebarThemeText:'Dark Mode', sidebarLang:'عربي',
-    sidebarGraduates:'Graduates Form',
-    backTop1:'Back to Top', backTop2:'Back to Top', backTop3:'Back to Top',
+    navTitle: 'Libyan Students Union',
+    navSub: 'Turkish Cyprus · قبرص التركية',
+    navMenuLabel: 'Menu',
+    langBtn: 'عربي',
+    sidebarLogoText: 'Libyan Students Union',
+    sidebarSec1: 'Navigation', sidebarSec2: 'Join Us', sidebarSec3: 'Settings',
+    sidebarHome: 'Home', sidebarAbout: 'About',
+    sidebarLeader: 'Leadership', sidebarCommittees: 'Committees',
+    sidebarGoals: 'Goals & Mission', sidebarGraduates: 'Graduates Form',
+    sidebarContact: 'Contact Us', sidebarJoin: 'Create Membership',
+    sidebarLogin: 'Sign In', sidebarMediaJoin: 'Join Media Committee',
+    sidebarOrgJoin: 'Join Organization Committee', sidebarLang: 'عربي',
+    sidebarThemeText: 'Dark Mode', sidebarFooter: '© 2026 Libyan Students Union',
+    backTop1: 'Back to Top', backTop2: 'Back to Top', backTop3: 'Back to Top',
+    heroEyebrow: 'Since 2026',
+    heroCta: 'Join the Union', heroGuest: 'Learn More',
+    guestTxt: 'or ', guestLink: 'Browse as Guest',
+    aboutLabel: 'About Us', aboutTitle: 'Who Are We?',
+    leaderLabel: 'Leadership', leaderTitle: 'Union Leadership',
+    commLabel: 'Committees', commTitle: 'Executive Committees',
+    goalsLabel: 'Our Mission', goalsTitle: 'Goals & Mission',
+    contactLabel: 'Contact', contactTitle: 'Contact Us',
+    mSub: 'Turkish Cyprus · قبرص التركية',
+    btnLogin: 'Sign In', btnReg: 'New Membership',
+    lEmail: 'Email / Student ID',
+    lPass: 'Password',
+    btnLoginSubmit: 'Sign In',
+    forgotLink: 'Forgot Password?',
+    backBtnText: 'Back', tfaBackText: 'Back',
+    modalLangBtn: 'عربي / EN',
+    modalThemeBtn: '🌙',
   };
+
   const t = isArabic ? ar : en;
   Object.entries(t).forEach(([id, text]) => {
     const el = document.getElementById(id);
     if (el) el.textContent = text;
   });
+
+  // Direction
+  document.documentElement.lang = isArabic ? 'ar' : 'en';
+  document.documentElement.dir  = isArabic ? 'rtl' : 'ltr';
+  document.body.classList.toggle('ltr', !isArabic);
+
+  // Sidebar RTL/LTR
+  const styleEl = document.getElementById('dirStyle') || (() => {
+    const s = document.createElement('style');
+    s.id = 'dirStyle';
+    document.head.appendChild(s);
+    return s;
+  })();
+  styleEl.textContent = isArabic
+    ? `#sidebar{right:0;left:auto;transform:translateX(110%)}#sidebar.open{transform:translateX(0)}.sidebar-link{text-align:right}`
+    : `#sidebar{left:0;right:auto;transform:translateX(-110%)}#sidebar.open{transform:translateX(0)}.sidebar-link{text-align:left}`;
 }
+
