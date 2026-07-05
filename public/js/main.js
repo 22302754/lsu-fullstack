@@ -20,14 +20,18 @@ function toggleTheme() {
   isDark = !isDark;
   document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
   const icon = isDark ? '🌙' : '☀️';
+  // Update navbar theme btn
   ['themeBtn','modalThemeBtn'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = icon;
   });
-  const sbIcon = document.getElementById('sbThemeIcon');
-  const sbTxt  = document.getElementById('sbTheme');
+  // Update sidebar theme icon and text
+  const sbIcon = document.getElementById('sidebarThemeIcon');
+  const sbTxt  = document.getElementById('sidebarThemeText');
   if (sbIcon) sbIcon.textContent = icon;
-  if (sbTxt)  sbTxt.textContent  = isDark ? (isArabic ? 'الوضع الليلي' : 'Dark Mode') : (isArabic ? 'الوضع النهاري' : 'Light Mode');
+  if (sbTxt)  sbTxt.textContent  = isDark
+    ? (isArabic ? 'الوضع الليلي' : 'Dark Mode')
+    : (isArabic ? 'الوضع النهاري' : 'Light Mode');
 }
 
 // ===== SCROLL =====
