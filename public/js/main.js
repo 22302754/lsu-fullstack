@@ -20,15 +20,14 @@ function toggleTheme() {
   isDark = !isDark;
   document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
   const icon = isDark ? '🌙' : '☀️';
-  // Update all theme buttons
   ['themeBtn','modalThemeBtn'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = icon;
   });
-  const sideIcon = document.getElementById('sidebarThemeIcon');
-  const sideText = document.getElementById('sidebarThemeText');
-  if (sideIcon) sideIcon.textContent = icon;
-  if (sideText) sideText.textContent = isDark ? (isArabic ? 'الوضع الليلي' : 'Dark Mode') : (isArabic ? 'الوضع النهاري' : 'Light Mode');
+  const sbIcon = document.getElementById('sbThemeIcon');
+  const sbTxt  = document.getElementById('sbTheme');
+  if (sbIcon) sbIcon.textContent = icon;
+  if (sbTxt)  sbTxt.textContent  = isDark ? (isArabic ? 'الوضع الليلي' : 'Dark Mode') : (isArabic ? 'الوضع النهاري' : 'Light Mode');
 }
 
 // ===== SCROLL =====
@@ -84,7 +83,6 @@ function closeSidebar() {
   document.body.style.overflow = '';
   const btn = document.getElementById('hamburgerBtn');
   if (btn) btn.classList.remove('is-open');
-  // Remove solid navbar if not scrolled
   if (window.scrollY <= 20) {
     const nav = document.getElementById('mainNav');
     if (nav) nav.classList.remove('sidebar-open');
@@ -398,6 +396,10 @@ function updateSidebarUser(name, membershipId) {
 
 // Check if user already logged in on page load
 function checkLoggedInUser() {
+  // Hide authModal on page load - user can open it manually
+  const modal = document.getElementById('authModal');
+  if (modal) modal.style.display = 'none';
+
   const userStr = localStorage.getItem('lsu_user');
   if (userStr) {
     try {
@@ -709,11 +711,11 @@ function closeCommitteeModal() {
 }
 
 async function submitCommitteeJoin() {
-  const fullName  = document.getElementById('cName')?.value;
-  const studentId = document.getElementById('cStudentId')?.value;
-  const uniMajor  = document.getElementById('cUniMajor')?.value;
-  const phone     = document.getElementById('cPhone')?.value;
-  const reason    = document.getElementById('cReason')?.value;
+  const fullName  = document.getElementById('cFullName')?.value?.trim();
+  const studentId = document.getElementById('cStudentId')?.value?.trim();
+  const uniMajor  = document.getElementById('cUniMajor')?.value?.trim();
+  const phone     = document.getElementById('cPhone')?.value?.trim();
+  const reason    = document.getElementById('cReason')?.value?.trim();
   if (!fullName || !phone || !reason) { alert(isArabic ? 'يرجى ملء جميع الحقول' : 'Fill all fields'); return; }
 
   const btn = document.getElementById('cSubmitBtn');
