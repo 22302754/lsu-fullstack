@@ -1714,24 +1714,17 @@ section { scroll-margin-top: 64px !important; }
   box-shadow: 0 3px 10px rgba(0,0,0,0.3);
 }
 
-/* ===== SIDEBAR ACCORDION FIX ===== */
-#sidebar .acc-body {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height .35s ease;
-}
-#sidebar .acc-body.open {
-  max-height: 600px;
-}
-#sidebar .sidebar-body {
-  flex: 1;
-  overflow-y: auto;
-}
 
-/* Sidebar logo fix */
+
+/* ===== SIDEBAR FIX ===== */
 .sidebar-logo img {
   width: 36px !important;
   height: 36px !important;
   border-radius: 8px !important;
   object-fit: cover !important;
+}
+
+/* Hero emblem - move down */
+.hero-emblem {
+  margin-top: 20px !important;
 }
