@@ -1728,3 +1728,31 @@ section { scroll-margin-top: 64px !important; }
 .hero-emblem {
   margin-top: 20px !important;
 }
+
+/* ===== SIDEBAR CLEAN REBUILD ===== */
+.sidebar-links-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.sb-group-label {
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding: 14px 20px 5px;
+}
+
+.sb-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 16px;
+}
+
+/* Remove old accordion styles that conflict */
+#sidebar .acc-item,
+#sidebar .acc-header,
+#sidebar .acc-body,
+#sidebar .acc-arrow { display: none !important; }
